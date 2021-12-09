@@ -1,3 +1,5 @@
-module github.com/fixme_my_friend/hw01_hello_otus
+module github.com/PalPalych7/PalPalych/hw01_hello_otus
 
 go 1.16
+
+
