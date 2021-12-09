@@ -14,5 +14,4 @@ func main() {
 	// Place your code here.
 	str := "Hello, OTUS!"
 	fmt.Println(Reverse(str))
-
 }
