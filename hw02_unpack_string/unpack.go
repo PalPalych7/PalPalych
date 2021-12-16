@@ -10,12 +10,10 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(str string) (string, error) {
-	var newStr string
 	var lastR rune
 	var isDigit bool
 	var lastIsDigit bool
-	//	fmt.Println(len(str))
-	//	fmt.Println(utf8.RuneCountInString(str))
+	var builder strings.Builder
 	for _, r := range str {
 		isDigit = unicode.IsDigit(r)
 		if lastR == 0 && isDigit {
@@ -29,16 +27,15 @@ func Unpack(str string) (string, error) {
 			if err != nil {
 				return "", err
 			}
-			newStr += strings.Repeat(string(lastR), i)
+			builder.WriteString(strings.Repeat(string(lastR), i))
 		} else if !lastIsDigit && lastR > 0 {
-			newStr += string(lastR)
+			builder.WriteRune(lastR)
 		}
 		lastR = r
 		lastIsDigit = isDigit
 	}
 	if !lastIsDigit && lastR > 0 {
-		newStr += string(lastR)
+		builder.WriteRune(lastR)
 	}
-
-	return newStr, nil
+	return builder.String(), nil
 }
