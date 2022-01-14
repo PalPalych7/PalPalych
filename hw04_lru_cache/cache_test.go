@@ -11,6 +11,7 @@ import (
 
 func TestCache(t *testing.T) {
 	t.Run("empty cache", func(t *testing.T) {
+
 		c := NewCache(10)
 
 		_, ok := c.Get("aaa")
@@ -50,8 +51,26 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		myCache := NewCache(5)
+		myCache.Set("arsenal", 3)
+		myCache.Set("loko", 1)
+		myCache.Set("milan", 2)
+		myCache.Set("udine", 12)
+		myCache.Set("psv", 19)
+		myCache.Set("lester", 12) // вытеснили arsenal
+		_, ok := myCache.Get("arsenal")
+		require.False(t, ok)
+
+		_, _ = myCache.Get("loko") // из конца очереди перемещаем в начало
+		myCache.Set("04", 12)      // вытеснили milan
+		_, ok = myCache.Get("milan")
+		require.False(t, ok)
+
+		myCache.Clear() // очистили cash
+		_, ok = myCache.Get("lester")
+		require.False(t, ok)
 	})
+
 }
 
 func TestCacheMultithreading(t *testing.T) {
@@ -76,4 +95,5 @@ func TestCacheMultithreading(t *testing.T) {
 	}()
 
 	wg.Wait()
+
 }
