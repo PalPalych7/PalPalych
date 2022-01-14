@@ -25,9 +25,9 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 		value: value,
 	}
 	v, ok := l.items[key]
-	if ok { //ключ есть в словаре
+	if ok { // ключ есть в словаре
 		if value == v.Value { // то-же значение
-		} else { //новое значение
+		} else { // новое значение
 			v.Value = *myCacheItem
 		}
 		l.queue.MoveToFront(v)
@@ -40,16 +40,19 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 	}
 	return ok
 }
+
 func (l *lruCache) Get(key Key) (interface{}, bool) {
 	v, ok := l.items[key]
 	if ok { // ключ есть в словаре
 		l.queue.MoveToFront(v)
 	}
+	var myInt interface{}
 	if ok {
-		return v.Value.(cacheItem).value, ok
+		myInt = v.Value.(cacheItem).value
 	} else {
-		return nil, false
+		myInt = nil
 	}
+	return myInt, ok
 }
 
 func (l *lruCache) Clear() {

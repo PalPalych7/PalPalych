@@ -79,7 +79,6 @@ func (l *list) Remove(i *ListItem) {
 			i.Prev.Next = nil
 		}
 		l.LastP = i.Prev
-		//		}
 	default:
 		i.Next.Prev = i.Prev
 		i.Prev.Next = i.Next

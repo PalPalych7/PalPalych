@@ -11,7 +11,6 @@ import (
 
 func TestCache(t *testing.T) {
 	t.Run("empty cache", func(t *testing.T) {
-
 		c := NewCache(10)
 
 		_, ok := c.Get("aaa")
@@ -70,7 +69,6 @@ func TestCache(t *testing.T) {
 		_, ok = myCache.Get("lester")
 		require.False(t, ok)
 	})
-
 }
 
 func TestCacheMultithreading(t *testing.T) {
@@ -95,5 +93,4 @@ func TestCacheMultithreading(t *testing.T) {
 	}()
 
 	wg.Wait()
-
 }
