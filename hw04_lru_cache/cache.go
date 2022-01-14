@@ -25,15 +25,15 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 		value: value,
 	}
 	v, ok := l.items[key]
-	if ok { // ключ есть в словаре
-		if value == v.Value { // то-же значение
-		} else { // новое значение
+	switch {
+	case ok: // ключ есть в словаре
+		if value != v.Value { //  новое значение
 			v.Value = *myCacheItem
 		}
 		l.queue.MoveToFront(v)
-	} else if l.queue.Len() < l.capacity { // не достигли предела. только записываем
+	case l.queue.Len() < l.capacity: // не достигли предела. только записываем
 		l.items[key] = l.queue.PushFront(*myCacheItem)
-	} else { // достигли предела. сперва удаляем
+	default: // достигли предела. сперва удаляем
 		delete(l.items, l.queue.Back().Value.(cacheItem).key)
 		l.queue.Remove(l.queue.Back())
 		l.items[key] = l.queue.PushFront(*myCacheItem)
