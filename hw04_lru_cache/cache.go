@@ -9,8 +9,6 @@ type Cache interface {
 }
 
 type lruCache struct {
-	Cache // Remove me after realization.
-
 	capacity int
 	queue    List
 	items    map[Key]*ListItem
@@ -19,6 +17,47 @@ type lruCache struct {
 type cacheItem struct {
 	key   Key
 	value interface{}
+}
+
+func (l *lruCache) Set(key Key, value interface{}) bool {
+	myCacheItem := &cacheItem{ // соберём структуру
+		key:   key,
+		value: value,
+	}
+	v, ok := l.items[key]
+	switch {
+	case ok: // ключ есть в словаре
+		if value != v.Value { //  новое значение
+			v.Value = *myCacheItem
+		}
+		l.queue.MoveToFront(v)
+	case l.queue.Len() < l.capacity: // не достигли предела. только записываем
+		l.items[key] = l.queue.PushFront(*myCacheItem)
+	default: // достигли предела. сперва удаляем
+		delete(l.items, l.queue.Back().Value.(cacheItem).key)
+		l.queue.Remove(l.queue.Back())
+		l.items[key] = l.queue.PushFront(*myCacheItem)
+	}
+	return ok
+}
+
+func (l *lruCache) Get(key Key) (interface{}, bool) {
+	v, ok := l.items[key]
+	if ok { // ключ есть в словаре
+		l.queue.MoveToFront(v)
+	}
+	var myInt interface{}
+	if ok {
+		myInt = v.Value.(cacheItem).value
+	} else {
+		myInt = nil
+	}
+	return myInt, ok
+}
+
+func (l *lruCache) Clear() {
+	l.queue = NewList()
+	l.items = nil
 }
 
 func NewCache(capacity int) Cache {
