@@ -7,6 +7,7 @@ import (
 )
 
 var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
+
 var ErrErrorsInParameters = errors.New("errors in input parameters")
 
 type Task func() error
