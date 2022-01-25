@@ -11,8 +11,6 @@ var ErrErrorsInParameters = errors.New("errors in input parameters")
 
 type Task func() error
 
-// Run starts tasks in n goroutines and stops its work when receiving m errors from tasks.
-
 func Run(tasks []Task, n, m int) error {
 	if m <= 0 || n <= 0 {
 		return ErrErrorsInParameters

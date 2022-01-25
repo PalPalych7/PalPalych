@@ -41,108 +41,108 @@ func TestRun(t *testing.T) {
 		finishGoCount := runtime.NumGoroutine()
 		require.Equal(t, startGoCount, finishGoCount, "there is no worked gorutin")
 	})
-	/*
-		t.Run("tasks without errors", func(t *testing.T) {
-			startGoCount := runtime.NumGoroutine()
-			tasksCount := 50
-			tasks := make([]Task, 0, tasksCount)
 
-			var runTasksCount int32
-			var sumTime time.Duration
+	t.Run("tasks without errors", func(t *testing.T) {
+		startGoCount := runtime.NumGoroutine()
+		tasksCount := 50
+		tasks := make([]Task, 0, tasksCount)
 
-			for i := 0; i < tasksCount; i++ {
-				taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
-				sumTime += taskSleep
+		var runTasksCount int32
+		var sumTime time.Duration
 
-				tasks = append(tasks, func() error {
-					time.Sleep(taskSleep)
-					atomic.AddInt32(&runTasksCount, 1)
-					return nil
-				})
-			}
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			sumTime += taskSleep
 
-			workersCount := 5
-			maxErrorsCount := 1
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
 
-			start := time.Now()
-			err := Run(tasks, workersCount, maxErrorsCount)
-			elapsedTime := time.Since(start)
-			require.NoError(t, err)
+		workersCount := 5
+		maxErrorsCount := 1
 
-			require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
-			require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
+		start := time.Now()
+		err := Run(tasks, workersCount, maxErrorsCount)
+		elapsedTime := time.Since(start)
+		require.NoError(t, err)
 
-			finishGoCount := runtime.NumGoroutine()
-			require.Equal(t, startGoCount, finishGoCount, "there is no worked gorutin")
-		})
+		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
+		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 
-		t.Run("tasks count less workersCount", func(t *testing.T) {
-			startGoCount := runtime.NumGoroutine()
-			tasksCount := 10
-			workersCount := 5
-			maxErrorsCount := 1
+		finishGoCount := runtime.NumGoroutine()
+		require.Equal(t, startGoCount, finishGoCount, "there is no worked gorutin")
+	})
 
-			tasks := make([]Task, 0, tasksCount)
+	t.Run("tasks count less workersCount", func(t *testing.T) {
+		startGoCount := runtime.NumGoroutine()
+		tasksCount := 10
+		workersCount := 5
+		maxErrorsCount := 1
 
-			var runTasksCount int32
-			var sumTime time.Duration
+		tasks := make([]Task, 0, tasksCount)
 
-			for i := 0; i < tasksCount; i++ {
-				taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
-				sumTime += taskSleep
+		var runTasksCount int32
+		var sumTime time.Duration
 
-				tasks = append(tasks, func() error {
-					time.Sleep(taskSleep)
-					atomic.AddInt32(&runTasksCount, 1)
-					return nil
-				})
-			}
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			sumTime += taskSleep
 
-			start := time.Now()
-			err := Run(tasks, workersCount, maxErrorsCount)
-			elapsedTime := time.Since(start)
-			require.NoError(t, err)
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
 
-			require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
-			require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
-			finishGoCount := runtime.NumGoroutine()
-			require.Equal(t, startGoCount, finishGoCount, "there is no worked gorutin")
-		})
+		start := time.Now()
+		err := Run(tasks, workersCount, maxErrorsCount)
+		elapsedTime := time.Since(start)
+		require.NoError(t, err)
 
-		t.Run("workersCount 0 or less", func(t *testing.T) {
-			tasksCount := 5
-			workersCount := 2
-			maxErrorsCount := 0
+		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
+		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
+		finishGoCount := runtime.NumGoroutine()
+		require.Equal(t, startGoCount, finishGoCount, "there is no worked gorutin")
+	})
 
-			tasks := make([]Task, 0, tasksCount)
+	t.Run("workersCount 0 or less", func(t *testing.T) {
+		tasksCount := 5
+		workersCount := 2
+		maxErrorsCount := 0
 
-			for i := 0; i < tasksCount; i++ {
-				taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
-				tasks = append(tasks, func() error {
-					time.Sleep(taskSleep)
-					return nil
-				})
-			}
-			err := Run(tasks, workersCount, maxErrorsCount)
-			require.Error(t, err)
-		})
+		tasks := make([]Task, 0, tasksCount)
 
-		t.Run("tasksCount 0 or less", func(t *testing.T) {
-			tasksCount := 3
-			workersCount := 0
-			maxErrorsCount := 1
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				return nil
+			})
+		}
+		err := Run(tasks, workersCount, maxErrorsCount)
+		require.Error(t, err)
+	})
 
-			tasks := make([]Task, 0, tasksCount)
+	t.Run("tasksCount 0 or less", func(t *testing.T) {
+		tasksCount := 3
+		workersCount := 0
+		maxErrorsCount := 1
 
-			for i := 0; i < tasksCount; i++ {
-				taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
-				tasks = append(tasks, func() error {
-					time.Sleep(taskSleep)
-					return nil
-				})
-			}
-			err := Run(tasks, workersCount, maxErrorsCount)
-			require.Error(t, err)
-		})
-	*/
+		tasks := make([]Task, 0, tasksCount)
+
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				return nil
+			})
+		}
+		err := Run(tasks, workersCount, maxErrorsCount)
+		require.Error(t, err)
+	})
+
 }
