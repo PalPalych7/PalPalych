@@ -26,5 +26,4 @@ func TestCopy(t *testing.T) {
 	myEr = Copy("testdata/input.txt", "2.txt", 10000, 0)
 	require.Error(t, myEr)
 	require.Truef(t, errors.Is(myEr, ErrOffsetExceedsFileSize), "actual error %q", myEr)
-	return
 }
