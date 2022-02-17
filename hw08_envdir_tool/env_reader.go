@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -23,14 +23,15 @@ type EnvValue struct {
 // Variables represented as files where filename is name of variable, file first line is a value.
 func ReadDir(dir string) (Environment, error) {
 	myMap := make(Environment)
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return myMap, ErrBadDir
 	}
 	var isEmpty bool
 	for _, file := range files {
-		fileWPath := dir + "/" + file.Name()
+		fileWPath := filepath.Join(dir, file.Name())
 		fileDescr, err := os.Open(fileWPath)
+		var newStr string
 		if err != nil {
 			return myMap, err
 		}
@@ -39,16 +40,13 @@ func ReadDir(dir string) (Environment, error) {
 			isEmpty = true
 		} else {
 			isEmpty = false
-		}
-		scanner := bufio.NewScanner(fileDescr)
-		scanner.Scan()
-		firstStr := scanner.Text()
-		//		newStr := string(bytes.ReplaceAll([]byte(firstStr), []byte(`^@`), []byte(`\n`)))
-		newStr := string(bytes.ReplaceAll([]byte(firstStr), []byte(`0x00`), []byte(`\n`)))
-		if file.Name() == "FOO" { // заплатка для прохождения основного теста
-			// Никак не могу сообразить как сделать правильный Replace,чтобы сделать самену на \n...
-			// Если намекнёте на варианты решения, буду благодарен и перделаю :)
-			newStr = `   foo\nwith new line`
+			scanner := bufio.NewScanner(fileDescr)
+			scanner.Scan()
+			//			firstStr := scanner.Text()
+			firstStr := scanner.Bytes()
+			var old []byte
+			old = append(old, 0x00)
+			newStr = string(bytes.ReplaceAll(firstStr, old, []byte(`\n`)))
 		}
 		myMap[file.Name()] = EnvValue{strings.TrimRight(newStr, " "), isEmpty}
 	}
