@@ -21,11 +21,6 @@ func RunCmd(cmd []string, env Environment) (returnCode int) {
 		}
 	}
 
-	//	paramsStr := ""
-	//	for i := 1; i < len(cmd); i++ {
-	//		paramsStr = paramsStr + cmd[i] + " "
-	//	}
-	//	paramsStr = strings.TrimRight(paramsStr, " ")
 	paramsStr := strings.Join(cmd[1:], " ")
 	myCmd := exec.Command(cmd[0], paramsStr) //nolint:gosec
 	myCmd.Stdout = os.Stdout

@@ -42,7 +42,6 @@ func ReadDir(dir string) (Environment, error) {
 			isEmpty = false
 			scanner := bufio.NewScanner(fileDescr)
 			scanner.Scan()
-			//			firstStr := scanner.Text()
 			firstStr := scanner.Bytes()
 			var old []byte
 			old = append(old, 0x00)
