@@ -1,3 +1,4 @@
+//go:build bench
 // +build bench
 
 package hw10programoptimization
@@ -34,9 +35,10 @@ func TestGetDomainStat_Time_And_Memory(t *testing.T) {
 
 		b.StartTimer()
 		stat, err := GetDomainStat(data, "biz")
+		//		_, err = GetDomainStat(data, "biz")
+
 		b.StopTimer()
 		require.NoError(t, err)
-
 		require.Equal(t, expectedBizStat, stat)
 	}
 
