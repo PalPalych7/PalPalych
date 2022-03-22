@@ -45,8 +45,8 @@ OUTER:
 			stop()
 			break OUTER
 		default:
-			//			scanner.Scan()
-			//			in.WriteString(scanner.Text() + "\n")
+			//	scanner.Scan()
+			//	in.WriteString(scanner.Text() + "\n")
 			myErr := client.Send()
 			if myErr == nil {
 				fmt.Fprint(os.Stderr, "...EOF")
