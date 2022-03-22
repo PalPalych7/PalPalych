@@ -28,21 +28,23 @@ func (myT *myTelnet) Connect() error {
 }
 
 func (myT *myTelnet) Send() error {
-	forSend, err := io.ReadAll(myT.In)
-	if err != nil {
-		return err
-	}
-	_, err = myT.Conn.Write(forSend)
+	_, err := io.Copy(myT.Conn, myT.In)
+	// forSend, err := io.ReadAll(myT.In)
+	// if err != nil {
+	//	return err
+	// }
+	// _, err = myT.Conn.Write(forSend)
 	return err
 }
 
 func (myT *myTelnet) Receive() error {
-	request := make([]byte, 1024)
-	n, err := myT.Conn.Read(request)
-	if err != nil {
-		return err
-	}
-	_, err = myT.Out.Write(request[:n])
+	_, err := io.Copy(myT.Out, myT.Conn)
+	//	request := make([]byte, 1024)
+	//	n, err := myT.Conn.Read(request)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	_, err = myT.Out.Write(request[:n])
 	return err
 }
 

@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/signal"
@@ -19,40 +16,44 @@ var (
 	address   string
 )
 
-func telnetRead(ctx context.Context, client TelnetClient, stop context.CancelFunc, out *bytes.Buffer) {
+func telnetRead(ctx context.Context, client TelnetClient, stop context.CancelFunc /*, out io.Writer*/) {
 OUTER:
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("Context done on read.", ctx.Err())
 			stop()
 			break OUTER
 		default:
 			myErr := client.Receive()
-			if myErr != nil {
-				stop()
+			if myErr == nil {
+				fmt.Fprint(os.Stderr, "...Connection was closed by peer")
+			} else {
+				fmt.Fprint(os.Stderr, "Reading error: ", myErr)
 			}
-			fmt.Print(out.String())
+			stop()
+			// fmt.Print(out.String())
 		}
 	}
 }
 
-func telnetWrite(ctx context.Context, client TelnetClient, stop context.CancelFunc, in *bytes.Buffer) {
-	scanner := bufio.NewScanner(os.Stdin)
+func telnetWrite(ctx context.Context, client TelnetClient, stop context.CancelFunc /*, in io.ReadCloser*/) {
+	//	scanner := bufio.NewScanner(os.Stdin)
 OUTER:
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("Context done on write. ", ctx.Err())
 			stop()
 			break OUTER
 		default:
-			scanner.Scan()
-			in.WriteString(scanner.Text() + "\n")
+			//			scanner.Scan()
+			//			in.WriteString(scanner.Text() + "\n")
 			myErr := client.Send()
-			if myErr != nil {
-				stop()
+			if myErr == nil {
+				fmt.Fprint(os.Stderr, "...EOF")
+			} else {
+				fmt.Fprint(os.Stderr, "Writng error: ", myErr)
 			}
+			stop()
 		}
 	}
 }
@@ -70,15 +71,17 @@ func main() {
 	} else {
 		address = net.JoinHostPort(myArgs[1], myArgs[2])
 	}
-
-	in := &bytes.Buffer{}
-	out := &bytes.Buffer{}
-	client := NewTelnetClient(address, myTimeout, ioutil.NopCloser(in), out)
+	// in := &bytes.Buffer{}
+	// out := &bytes.Buffer{}
+	// client := NewTelnetClient(address, myTimeout, ioutil.NopCloser(in), out)
+	in := os.Stdin
+	out := os.Stdout
+	client := NewTelnetClient(address, myTimeout, in, out)
 	client.Connect()
+	defer client.Close()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	go telnetRead(ctx, client, stop, out)
-	go telnetWrite(ctx, client, stop, in)
+	go telnetRead(ctx, client, stop /*, out*/)
+	go telnetWrite(ctx, client, stop /*, in*/)
 	<-ctx.Done()
-	client.Close()
-	fmt.Println("finish")
+	//	fmt.Println("finish")
 }
