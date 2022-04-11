@@ -25,8 +25,7 @@ func telnetRead(ctx context.Context, client TelnetClient, stop context.CancelFun
 			stop()
 			return
 		default:
-			myErr := client.Receive()
-			if myErr == nil {
+			if myErr := client.Receive(); myErr == nil {
 				fmt.Fprint(os.Stderr, "...Connection was closed by peer")
 			} else {
 				fmt.Fprint(os.Stderr, "Reading error: ", myErr)
@@ -43,14 +42,11 @@ func telnetWrite(ctx context.Context, client TelnetClient, stop context.CancelFu
 			stop()
 			return
 		default:
-			writer := os.Stdout
 			out := "...EOF"
-			myErr := client.Send()
-			if myErr != nil {
-				writer = os.Stderr
+			if myErr := client.Send(); myErr == nil {
 				out = "Writing error: " + myErr.Error()
 			}
-			fmt.Fprint(writer, out)
+			fmt.Fprint(os.Stderr, out)
 			stop()
 		}
 	}
