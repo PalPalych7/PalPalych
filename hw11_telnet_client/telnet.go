@@ -11,6 +11,7 @@ type TelnetClient interface {
 	io.Closer
 	Send() error
 	Receive() error
+	Close() error
 }
 
 type myTelnet struct {
