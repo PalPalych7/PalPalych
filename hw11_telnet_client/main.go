@@ -16,13 +16,14 @@ var (
 	address   string
 )
 
-func telnetRead(ctx context.Context, client TelnetClient, stop context.CancelFunc /*, out io.Writer*/) {
-OUTER:
+const minParms = 3
+
+func telnetRead(ctx context.Context, client TelnetClient, stop context.CancelFunc) {
 	for {
 		select {
 		case <-ctx.Done():
 			stop()
-			break OUTER
+			return
 		default:
 			myErr := client.Receive()
 			if myErr == nil {
@@ -31,28 +32,25 @@ OUTER:
 				fmt.Fprint(os.Stderr, "Reading error: ", myErr)
 			}
 			stop()
-			// fmt.Print(out.String())
 		}
 	}
 }
 
-func telnetWrite(ctx context.Context, client TelnetClient, stop context.CancelFunc /*, in io.ReadCloser*/) {
-	//	scanner := bufio.NewScanner(os.Stdin)
-OUTER:
+func telnetWrite(ctx context.Context, client TelnetClient, stop context.CancelFunc) {
 	for {
 		select {
 		case <-ctx.Done():
 			stop()
-			break OUTER
+			return
 		default:
-			//	scanner.Scan()
-			//	in.WriteString(scanner.Text() + "\n")
+			writer := os.Stdout
+			out := "...EOF"
 			myErr := client.Send()
-			if myErr == nil {
-				fmt.Fprint(os.Stderr, "...EOF")
-			} else {
-				fmt.Fprint(os.Stderr, "Writng error: ", myErr)
+			if myErr != nil {
+				writer = os.Stderr
+				out = "Writing error: " + myErr.Error()
 			}
+			fmt.Fprint(writer, out)
 			stop()
 		}
 	}
@@ -62,7 +60,7 @@ func main() {
 	flag.DurationVar(&myTimeout, "timeout", time.Second*10, "time out")
 	flag.Parse()
 	myArgs := os.Args
-	if len(myArgs) < 3 {
+	if len(myArgs) < minParms {
 		fmt.Println("not enough input params")
 		return
 	}
@@ -71,17 +69,13 @@ func main() {
 	} else {
 		address = net.JoinHostPort(myArgs[1], myArgs[2])
 	}
-	// in := &bytes.Buffer{}
-	// out := &bytes.Buffer{}
-	// client := NewTelnetClient(address, myTimeout, ioutil.NopCloser(in), out)
 	in := os.Stdin
 	out := os.Stdout
 	client := NewTelnetClient(address, myTimeout, in, out)
 	client.Connect()
 	defer client.Close()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	go telnetRead(ctx, client, stop /*, out*/)
-	go telnetWrite(ctx, client, stop /*, in*/)
+	go telnetRead(ctx, client, stop)
+	go telnetWrite(ctx, client, stop)
 	<-ctx.Done()
-	//	fmt.Println("finish")
 }

@@ -29,22 +29,11 @@ func (myT *myTelnet) Connect() error {
 
 func (myT *myTelnet) Send() error {
 	_, err := io.Copy(myT.Conn, myT.In)
-	// forSend, err := io.ReadAll(myT.In)
-	// if err != nil {
-	//	return err
-	// }
-	// _, err = myT.Conn.Write(forSend)
 	return err
 }
 
 func (myT *myTelnet) Receive() error {
 	_, err := io.Copy(myT.Out, myT.Conn)
-	//	request := make([]byte, 1024)
-	//	n, err := myT.Conn.Read(request)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	_, err = myT.Out.Write(request[:n])
 	return err
 }
 
@@ -54,10 +43,11 @@ func (myT *myTelnet) Close() error {
 }
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient /*myTelnet*/ {
-	myTelnetClient := new(myTelnet)
-	myTelnetClient.Adr = address
-	myTelnetClient.Timeout = timeout
-	myTelnetClient.In = in
-	myTelnetClient.Out = out
+	myTelnetClient := &myTelnet{
+		Adr:     address,
+		In:      in,
+		Timeout: timeout,
+		Out:     out,
+	}
 	return TelnetClient(myTelnetClient)
 }
