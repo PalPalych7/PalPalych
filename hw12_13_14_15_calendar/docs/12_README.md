@@ -82,7 +82,7 @@ create database hw12;
 create user testUser with encrypted password 'testUser';
 create user otus1 with encrypted password '123456';
 grant all privileges on database hw12 to otus1;
-create table event (
+create table events (
     ID text primary key,
     Title text,
     StartDate date,
