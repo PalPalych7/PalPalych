@@ -95,8 +95,9 @@ func (s *Storage) GetEventByDate(startDateStr string) ([]st.Event, error) {
 	query := `
 		select ID, Title, StartDate, Details,UserID
 		from events
-		where StartDate=$1	
+		where StartDate=$1
     `
+
 	rows, err := s.DbConnect.Query(query, startDateStr)
 	defer rows.Close()
 	if err != nil {
@@ -177,6 +178,5 @@ func (s *Storage) Close(ctx context.Context) error {
 func dbConect(dsn string) (*sql.DB, error) {
 	//	db, err := sql.Open("pgx", dsn)
 	db, err := sql.Open("postgres", dsn)
-	//	fmt.Println(db, err)
 	return db, err
 }

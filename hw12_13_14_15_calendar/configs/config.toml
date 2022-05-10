@@ -1,5 +1,12 @@
-[logger]
-level = "INFO"
-
-# TODO
-# ...
+[Logger]
+Level = "TRACE"
+LogFile="/home/palpalych/calend/main.log"
+[Storage]
+StorageType="memory"
+[DB]
+DbName="hw12" 
+DbUserName="otus1" 
+DbPassword="123456"
+[Http]
+Host="127.0.0.1"
+Port="8080"

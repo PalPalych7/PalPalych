@@ -79,7 +79,6 @@ sudo systemctl start postgresql
 sudo -u postgres psql
 ---------------------------------------
 create database hw12;
-create user testUser with encrypted password 'testUser';
 create user otus1 with encrypted password '123456';
 grant all privileges on database hw12 to otus1;
 create table events (

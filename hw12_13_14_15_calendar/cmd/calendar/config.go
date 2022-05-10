@@ -20,10 +20,18 @@ type HttpConf struct {
 type StorageConf struct {
 	StorageType string
 }
+
+type DBConf struct {
+	DbName     string
+	DbUserName string
+	DbPassword string
+}
+
 type Config struct {
 	Logger  LoggerConf
 	Http    HttpConf
 	Storage StorageConf
+	DB      DBConf
 }
 
 func NewConfig(configFile string) Config {
@@ -35,5 +43,3 @@ func NewConfig(configFile string) Config {
 	//	fmt.Println("q=", q, "mc=", myConf)
 	return myConf
 }
-
-// TODO

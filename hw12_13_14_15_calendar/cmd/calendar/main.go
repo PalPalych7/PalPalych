@@ -13,6 +13,7 @@ import (
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
@@ -38,7 +39,13 @@ func main() {
 	logg.Info("Start!")
 	var calendar *app.App
 	if config.Storage.StorageType == "memory" {
+		logg.Info("Work with memory")
 		storage := memorystorage.New()
+		logg.Info("Get new storage:", storage)
+		calendar = app.New(logg, storage)
+	} else {
+		logg.Info("Work with sql")
+		storage := sqlstorage.New(config.DB.DbName, config.DB.DbUserName, config.DB.DbPassword)
 		logg.Info("Get new storage:", storage)
 		calendar = app.New(logg, storage)
 	}
