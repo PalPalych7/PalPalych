@@ -13,23 +13,25 @@ type LoggerConf struct {
 	LogFile string
 	Level   string
 }
-type HttpConf struct {
+
+type HTTPConf struct {
 	Host string
 	Port string
 }
+
 type StorageConf struct {
 	StorageType string
 }
 
 type DBConf struct {
-	DbName     string
-	DbUserName string
-	DbPassword string
+	DBName     string
+	DBUserName string
+	DBPassword string
 }
 
 type Config struct {
 	Logger  LoggerConf
-	Http    HttpConf
+	HTTP    HTTPConf
 	Storage StorageConf
 	DB      DBConf
 }

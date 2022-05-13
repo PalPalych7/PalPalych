@@ -8,10 +8,12 @@ import (
 	st "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage"
 )
 
-var ErrDate = errors.New("invalid Date format")
-var IdNotFound = errors.New("EventID not found")
-var ErrNotBeginMonth = errors.New("Date is not Begin Month")
-var ErrNotBeginWeek = errors.New("Date is not Begin Week")
+var (
+	ErrDate           = errors.New("invalid Date format")
+	EventIDIsNotFound = errors.New("eventID not found") // nolint
+	ErrNotBeginMonth  = errors.New("date is not Begin Month")
+	ErrNotBeginWeek   = errors.New("date is not Begin Week")
+)
 
 type Storage struct {
 	//	Events []st.Event
@@ -26,9 +28,9 @@ func (s *Storage) CreateEvent(title, startDateStr, details string, userID int) e
 	if err != nil {
 		return ErrDate
 	}
-	myId := st.GenUUID()
-	myEvent := st.Event{ID: myId, Title: title, StartDate: myTime, Details: details, UserID: userID}
-	s.Events[myId] = myEvent
+	myID := st.GenUUID()
+	myEvent := st.Event{ID: myID, Title: title, StartDate: myTime, Details: details, UserID: userID}
+	s.Events[myID] = myEvent
 	//	s.Events = append(s.Events, myEvent)
 	return nil
 }
@@ -36,9 +38,8 @@ func (s *Storage) CreateEvent(title, startDateStr, details string, userID int) e
 func (s *Storage) UpdateEvent(eventID, title, startDateStr, details string, userID int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	_, ok := s.Events[eventID]
-	if !ok {
-		return IdNotFound
+	if _, ok := s.Events[eventID]; !ok {
+		return EventIDIsNotFound
 	}
 	myTime, err := time.Parse("2.1.2006", startDateStr)
 	if err != nil {
@@ -52,9 +53,8 @@ func (s *Storage) UpdateEvent(eventID, title, startDateStr, details string, user
 func (s *Storage) DeleteEvent(eventID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	_, ok := s.Events[eventID]
-	if !ok {
-		return IdNotFound
+	if _, ok := s.Events[eventID]; !ok {
+		return EventIDIsNotFound
 	}
 	delete(s.Events, eventID)
 	return nil
@@ -112,7 +112,6 @@ func (s *Storage) GetEventWeek(startDateStr string) ([]st.Event, error) {
 
 func New() *Storage {
 	return &Storage{
-		//[]st.Event{},
 		map[string]st.Event{},
 		sync.RWMutex{},
 	}

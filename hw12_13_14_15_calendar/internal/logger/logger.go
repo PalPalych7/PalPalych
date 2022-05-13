@@ -11,10 +11,7 @@ import (
 type Logger struct { // TODO
 }
 
-func New(FileName string, level string) *logrus.Logger { //*zap.Logger {
-	//	var cfg zap.Config
-	//	cfg.Level =
-	//	logger, err := zap.NewProduction()
+func New(fileName string, level string) *logrus.Logger {
 	logger := logrus.New()
 	var mylevel logrus.Level
 	switch strings.ToUpper(level) {
@@ -32,8 +29,8 @@ func New(FileName string, level string) *logrus.Logger { //*zap.Logger {
 		mylevel = logrus.TraceLevel
 	}
 	logger.Level = mylevel
-	if FileName != "" {
-		file, err := os.OpenFile(FileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if fileName != "" {
+		file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o666)
 		//		defer file.Close()
 		if err == nil {
 			logger.Out = file

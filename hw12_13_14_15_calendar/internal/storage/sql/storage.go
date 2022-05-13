@@ -8,44 +8,46 @@ import (
 	"time"
 
 	st "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage"
-	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/jackc/pgx/stdlib" // justifying
 	_ "github.com/lib/pq"
 )
 
-var ErrDate = errors.New("invalid Date format")
-var IdNotFound = errors.New("EventID not found")
-var ErrNotBeginMonth = errors.New("Date is not Begin Month")
-var ErrNotBeginWeek = errors.New("Date is not Begin Week")
+var (
+	ErrDate          = errors.New("invalid Date format")
+	ErrNotBeginMonth = errors.New("date is not Begin Month")
+	ErrNotBeginWeek  = errors.New("date is not Begin Week")
+)
 
 type Storage struct {
-	DbName     string
-	DbUserName string
-	DbPassword string
-	DbConnect  *sql.DB
+	DBName     string
+	DBUserName string
+	DBPassword string
+	DBConnect  *sql.DB
 }
 
 func New(dbName, dbUserName, dbPassword string) *Storage {
 	return &Storage{
-		DbName: dbName, DbUserName: dbUserName, DbPassword: dbPassword,
+		DBName: dbName, DBUserName: dbUserName, DBPassword: dbPassword,
 	}
 }
 
 func (s *Storage) Connect(ctx context.Context) error {
 	var err error
-	s.DbConnect, err = sql.Open("postgres", "user="+s.DbUserName+" dbname="+s.DbName+" password="+s.DbPassword+" sslmode=disable")
+	myStr := "user=" + s.DBUserName + " dbname=" + s.DBName + " password=" + s.DBPassword + " sslmode=disable"
+	s.DBConnect, err = sql.Open("postgres", myStr)
 	if err == nil {
-		err = s.DbConnect.PingContext(ctx)
+		err = s.DBConnect.PingContext(ctx)
 	}
 	return err
 }
 
 func (s *Storage) CreateEvent(title, startDateStr, details string, userID int) error {
-	myId := st.GenUUID()
+	myID := st.GenUUID()
 	query := `
 		insert into events(ID, Title, StartDate, Details,UserID)
-		values($1, $2, $3, $4, $5)
+		values($1, $2, to_date($3,'DD.MM.YYYY'), $4, $5)
 	`
-	result, err := s.DbConnect.Exec(query, myId, title, startDateStr, details, userID)
+	result, err := s.DBConnect.Exec(query, myID, title, startDateStr, details, userID)
 	fmt.Println(result, err)
 	return err
 }
@@ -55,12 +57,12 @@ func (s *Storage) UpdateEvent(eventID, title, startDateStr, details string, user
 		update events
 		set 
 		Title=$1,
-		StartDate=$2, 
+		StartDate=to_date($2,'DD.MM.YYYY'), 
 		Details=$3,
 		UserID=$4
-		where id=ID=$5	
+		where ID=$5	
     `
-	result, err := s.DbConnect.Exec(query, title, startDateStr, details, userID, eventID)
+	result, err := s.DBConnect.Exec(query, title, startDateStr, details, userID, eventID)
 	fmt.Println(result, err)
 	return err
 }
@@ -69,9 +71,9 @@ func (s *Storage) DeleteEvent(eventID string) error {
 	query := `
 		delete 
 		from events
-		where StartDate=$1	
+		where ID=$1
     `
-	result, err := s.DbConnect.Exec(query, eventID)
+	result, err := s.DBConnect.Exec(query, eventID)
 	fmt.Println(result, err)
 	return err
 }
@@ -81,12 +83,12 @@ func rowsToStruct(rows *sql.Rows) ([]st.Event, error) {
 	var eventID, title, details string
 	var userID int
 	var startDateStr time.Time
-
+	defer rows.Close()
 	for rows.Next() {
 		if err := rows.Scan(&eventID, &title, &startDateStr, &details, &userID); err != nil {
 			return nil, err
 		}
-		myEventList = append(myEventList, st.Event{ID: eventID, Title: title, StartDate: startDateStr, Details: details, UserID: userID})
+		myEventList = append(myEventList, st.Event{ID: eventID, Title: title, StartDate: startDateStr, Details: details, UserID: userID}) //nolint
 	}
 	return myEventList, nil
 }
@@ -95,11 +97,11 @@ func (s *Storage) GetEventByDate(startDateStr string) ([]st.Event, error) {
 	query := `
 		select ID, Title, StartDate, Details,UserID
 		from events
-		where StartDate=$1
+		where StartDate=to_date($1,'DD.MM.YYYY')
     `
 
-	rows, err := s.DbConnect.Query(query, startDateStr)
-	defer rows.Close()
+	rows, err := s.DBConnect.Query(query, startDateStr)
+	//	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -120,10 +122,10 @@ func (s *Storage) GetEventMonth(startDateStr string) ([]st.Event, error) {
 	query := `
 		select ID, Title, StartDate, Details,UserID
 		from events
-		where date_trunc('month',StartDate)=$1	
+		where date_trunc('month',StartDate)=to_date($1,'DD.MM.YYYY')
 	`
-	rows, err := s.DbConnect.Query(query, startDateStr)
-	defer rows.Close()
+	rows, err := s.DBConnect.Query(query, startDateStr)
+	//	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -144,10 +146,10 @@ func (s *Storage) GetEventWeek(startDateStr string) ([]st.Event, error) {
 	query := `
 		select ID, Title, StartDate, Details,UserID
 		from events
-		where date_trunc('week',StartDate)=$1	
+		where date_trunc('week',StartDate)=to_date($1,'DD.MM.YYYY')
 	`
-	rows, err := s.DbConnect.Query(query, startDateStr)
-	defer rows.Close()
+	rows, err := s.DBConnect.Query(query, startDateStr)
+	//	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +157,7 @@ func (s *Storage) GetEventWeek(startDateStr string) ([]st.Event, error) {
 	return myEventList, newErr
 }
 
+/* not use
 func (s *Storage) CreateTable() error {
 	query := `
 	create table events (
@@ -168,15 +171,9 @@ func (s *Storage) CreateTable() error {
 	result, err := s.DbConnect.Exec(query)
 	fmt.Println(result, err)
 	return err
-}
+}*/
 
 func (s *Storage) Close(ctx context.Context) error {
-	err := s.DbConnect.Close()
+	err := s.DBConnect.Close()
 	return err
-}
-
-func dbConect(dsn string) (*sql.DB, error) {
-	//	db, err := sql.Open("pgx", dsn)
-	db, err := sql.Open("postgres", dsn)
-	return db, err
 }

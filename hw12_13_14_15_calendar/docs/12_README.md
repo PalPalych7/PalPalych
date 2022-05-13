@@ -66,38 +66,6 @@
 * **in-memory**: храним события в памяти (т.е. просто складываем объекты в словари/слайсы, не забывая про критические секции);
 * **sql**: храним события в полноценной СУБД путем использования SQL-запросов в соответствующих методах.
 
-
---------------
-    ID        string
-	Title     string
-	StartDate time.Time
-	//	EndtDate  time.Time
-	Details string
-	UserID  int
--------------------------------------
-sudo systemctl start postgresql
-sudo -u postgres psql
----------------------------------------
-create database hw12;
-create user otus1 with encrypted password '123456';
-grant all privileges on database hw12 to otus1;
-create table events (
-    ID text primary key,
-    Title text,
-    StartDate date,
-    Details text,
-    UserID bigint
-);
-
-
-create index ind1 on event (StartDate);
-select * from event;
-insert into event (ID, Title,  StartDate, Details, UserID)
-values('123424','Test','2022-04-27','TestDetails',2);
-
-
-
-
 Вынести в конфиг параметр, отвечающий за то, какую из реализаций использовать при старте.
 
 Для работоспособности второй реализации необходимо:

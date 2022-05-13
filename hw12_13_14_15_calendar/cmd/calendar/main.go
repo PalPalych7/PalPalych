@@ -45,13 +45,13 @@ func main() {
 		calendar = app.New(logg, storage)
 	} else {
 		logg.Info("Work with sql")
-		storage := sqlstorage.New(config.DB.DbName, config.DB.DbUserName, config.DB.DbPassword)
+		storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword)
 		logg.Info("Get new storage:", storage)
 		calendar = app.New(logg, storage)
 	}
 	calendar.Logg.Info("Get new calendar:", calendar)
 
-	server := internalhttp.NewServer( /*logg,*/ calendar, config.Http.Host+":"+config.Http.Port)
+	server := internalhttp.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
 	fmt.Println("server=", server)
 
 	calendar.Logg.Info("server:", server)
