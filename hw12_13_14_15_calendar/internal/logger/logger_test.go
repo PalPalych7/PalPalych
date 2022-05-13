@@ -1,7 +1,12 @@
 package logger
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLogger(t *testing.T) {
-	// TODO
+	q2 := New("", "debug")
+	q2.Trace("trace")
+	q2.Warn("warn")
+	q2.Error("er")
 }

@@ -3,21 +3,23 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/app"
+	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
+	memorystorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "/home/palpalych/calend/config.toml", "Path to configuration file")
 }
 
 func main() {
@@ -27,14 +29,32 @@ func main() {
 		printVersion()
 		return
 	}
+	fmt.Println(flag.Args(), configFile)
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	config := NewConfig(configFile)
+	fmt.Println("config=", config)
+	logg := logger.New(config.Logger.LogFile, config.Logger.Level)
+	fmt.Println(config.Logger.Level)
+	fmt.Println("logg=", logg)
+	logg.Info("Start!")
+	var calendar *app.App
+	if config.Storage.StorageType == "memory" {
+		logg.Info("Work with memory")
+		storage := memorystorage.New()
+		logg.Info("Get new storage:", storage)
+		calendar = app.New(logg, storage)
+	} else {
+		logg.Info("Work with sql")
+		storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword)
+		logg.Info("Get new storage:", storage)
+		calendar = app.New(logg, storage)
+	}
+	calendar.Logg.Info("Get new calendar:", calendar)
 
-	storage := memorystorage.New()
-	calendar := app.New(logg, storage)
+	server := internalhttp.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
+	fmt.Println("server=", server)
 
-	server := internalhttp.NewServer(logg, calendar)
+	calendar.Logg.Info("server:", server)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -58,4 +78,5 @@ func main() {
 		cancel()
 		os.Exit(1) //nolint:gocritic
 	}
+	logg.Info("Finish")
 }
