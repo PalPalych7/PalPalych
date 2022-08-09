@@ -1,4 +1,4 @@
-package internalhttpGRPC
+package internalhttpgrpc
 
 import (
 	"context"
@@ -12,8 +12,9 @@ import (
 type Validator func(req interface{}) error
 
 func myMiddleware(validator Validator) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		ctx = context.WithValue(ctx, "TimeStart", time.Now())
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) { //nolint:lll
+		startTime := time.Now()
+		ctx = context.WithValue(ctx, "TimeStart", startTime) //nolint:staticcheck
 		if err := validator(req); err != nil {
 			return nil, err
 		}

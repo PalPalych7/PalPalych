@@ -1,4 +1,4 @@
-package internalhttpGRPC
+package internalhttpgrpc
 
 import (
 	"context"
@@ -9,8 +9,6 @@ import (
 
 	st "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage"
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/pb"
-
-	//	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -21,13 +19,13 @@ type Server struct {
 	MyHTTP   *grpc.Server
 }
 
-func writeLogResult(ctx context.Context, myMethod string, App Application) {
+func writeLogResult(ctx context.Context, myMethod string, app Application) {
 	headers, ok := metadata.FromIncomingContext(ctx)
-	var myIp, myClient string
-	if ok != false {
-		Ip := headers.Get(":authority")
-		if len(Ip) > 0 {
-			myIp = Ip[0]
+	var myIP, myClient string
+	if !ok {
+		IP := headers.Get(":authority")
+		if len(IP) > 0 {
+			myIP = IP[0]
 		}
 		Client := headers.Get("grpc-client")
 		if len(Client) > 0 {
@@ -37,9 +35,9 @@ func writeLogResult(ctx context.Context, myMethod string, App Application) {
 	myTimeStart, ok := ctx.Value("TimeStart").(time.Time)
 	if !ok {
 		myTimeStart = time.Now()
-		App.Error("Erorr getting myTimeStart from context:", myTimeStart)
+		app.Error("Erorr getting myTimeStart from context:", myTimeStart)
 	}
-	App.Info(myIp, myClient, myMethod, myTimeStart, time.Since(myTimeStart))
+	app.Info(myIP, myClient, myMethod, myTimeStart, time.Since(myTimeStart))
 }
 
 type Service struct {
