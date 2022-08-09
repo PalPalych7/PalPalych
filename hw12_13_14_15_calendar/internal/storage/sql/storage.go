@@ -110,7 +110,7 @@ func (s *Storage) GetEventByDate(startDateStr string) ([]st.Event, error) {
 }
 
 func (s *Storage) GetEventMonth(startDateStr string) ([]st.Event, error) {
-	myTime, err := time.Parse("2006-1-2", startDateStr)
+	myTime, err := time.Parse("2.1.2006", startDateStr)
 	fmt.Println("myT=", myTime)
 	if err != nil {
 		return nil, ErrDate
@@ -134,7 +134,7 @@ func (s *Storage) GetEventMonth(startDateStr string) ([]st.Event, error) {
 }
 
 func (s *Storage) GetEventWeek(startDateStr string) ([]st.Event, error) {
-	myTime, err := time.Parse("2006-1-2", startDateStr)
+	myTime, err := time.Parse("2.1.2006", startDateStr)
 	fmt.Println("myT=", myTime)
 	if err != nil {
 		return nil, ErrDate

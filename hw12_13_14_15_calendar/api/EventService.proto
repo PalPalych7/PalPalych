@@ -2,6 +2,55 @@ syntax = "proto3";
 
 package event;
 
-message Event {
-    // TODO
+option go_package = "./;pb";
+
+service myServ {
+  rpc CreateEvent    (ForCreate)  returns (Error) {}
+  rpc UpdateEvent    (ForUpdate)  returns (Error) {}
+  rpc DeleteEvent    (ForDelete)  returns (Error) {}
+  rpc GetEventByDate (StartDate) returns (Events) {}
+  rpc GetEventMonth  (StartDate) returns (Events) {}
+  rpc GetEventWeek   (StartDate) returns (Events) {}
+}
+
+message StartDate {
+  string StartDateStr  = 1;       
+}
+
+message Error {
+  string ErrorText  = 1;       
+}
+
+message ForCreate {
+  string Title     = 2;    
+  string StartDate = 3;  //
+  string Details   = 4;  
+  uint32 UserID    = 5; 
+}
+
+message ForUpdate {
+  string EventID   = 1;       
+  string Title     = 2;    
+  string StartDate = 3;  //
+  string Details   = 4;  
+  uint32 UserID    = 5; 
+}
+
+message ForDelete {
+  string EventID   = 1;       
+}  
+
+message OneEvent {
+    string EventID   = 1;       
+    string Title     = 2;    
+    string StartDate = 3;  //
+    string Details   = 4;  
+    uint32 UserID    = 5; 
+}
+
+
+
+message Events {
+  repeated OneEvent Result = 1;   
+  string ErrorText         = 2;  
 }

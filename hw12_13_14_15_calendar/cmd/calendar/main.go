@@ -11,7 +11,9 @@ import (
 
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/app"
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
+
+	//	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
+	internalhttpGRPC "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/HTTP_GRPC"
 	memorystorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/memory"
 	sqlstorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/sql"
 )
@@ -47,11 +49,20 @@ func main() {
 		logg.Info("Work with sql")
 		storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword)
 		logg.Info("Get new storage:", storage)
+		err := storage.Connect(context.Background())
+		if err != nil {
+			logg.Fatal(err.Error())
+		}
+		err = storage.DBConnect.Ping()
+		if err != nil {
+			logg.Fatal(err.Error())
+		}
 		calendar = app.New(logg, storage)
 	}
 	calendar.Logg.Info("Get new calendar:", calendar)
 
-	server := internalhttp.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
+	//server := internalhttp.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
+	server := internalhttpGRPC.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
 	fmt.Println("server=", server)
 
 	calendar.Logg.Info("server:", server)

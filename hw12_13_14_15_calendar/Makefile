@@ -30,5 +30,9 @@ install-lint-deps:
 
 lint: install-lint-deps
 	CGO_ENABLED=0 golangci-lint run ./...
-    
+
+
+grpc_generate:
+	protoc --proto_path=api --go_out=pb/ --go-grpc_out=pb/ api/*.proto
+
 .PHONY: build run build-img run-img version test lint
