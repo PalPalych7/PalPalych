@@ -19,6 +19,11 @@ type HTTPConf struct {
 	Port string
 }
 
+type GRPCConf struct {
+	Host string
+	Port string
+}
+
 type StorageConf struct {
 	StorageType string
 }
@@ -32,6 +37,7 @@ type DBConf struct {
 type Config struct {
 	Logger  LoggerConf
 	HTTP    HTTPConf
+	GRPC    GRPCConf
 	Storage StorageConf
 	DB      DBConf
 }

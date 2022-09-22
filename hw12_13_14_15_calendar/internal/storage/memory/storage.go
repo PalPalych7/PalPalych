@@ -16,7 +16,6 @@ var (
 )
 
 type Storage struct {
-	//	Events []st.Event
 	Events map[string]st.Event
 	mu     sync.RWMutex
 }
@@ -31,7 +30,6 @@ func (s *Storage) CreateEvent(title, startDateStr, details string, userID int) e
 	myID := st.GenUUID()
 	myEvent := st.Event{ID: myID, Title: title, StartDate: myTime, Details: details, UserID: userID}
 	s.Events[myID] = myEvent
-	//	s.Events = append(s.Events, myEvent)
 	return nil
 }
 

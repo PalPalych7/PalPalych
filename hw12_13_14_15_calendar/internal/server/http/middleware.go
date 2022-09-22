@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
-func loggingMiddleware(server /*http.Handler*/ *Server, r *http.Request, myTimeStart time.Time) /*http.Handler*/ {
-	myRec := *r
-	server.App.Info(myRec.RemoteAddr, myTimeStart, myRec.Method, myRec.Proto, time.Since(myTimeStart), myRec.UserAgent())
-	//	return Server //http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (s *Server) loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		myTimeStart := time.Now()
+		next.ServeHTTP(rw, r)
+		s.App.Info(r.RemoteAddr, myTimeStart, r.Method, r.Proto, time.Since(myTimeStart), r.UserAgent())
+	})
 }

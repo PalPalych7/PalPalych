@@ -8,6 +8,7 @@ package pb
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,9 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MyServClient interface {
-	CreateEvent(ctx context.Context, in *ForCreate, opts ...grpc.CallOption) (*Error, error)
-	UpdateEvent(ctx context.Context, in *ForUpdate, opts ...grpc.CallOption) (*Error, error)
-	DeleteEvent(ctx context.Context, in *ForDelete, opts ...grpc.CallOption) (*Error, error)
+	CreateEvent(ctx context.Context, in *ForCreate, opts ...grpc.CallOption) (*empty.Empty, error)
+	UpdateEvent(ctx context.Context, in *ForUpdate, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteEvent(ctx context.Context, in *ForDelete, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetEventByDate(ctx context.Context, in *StartDate, opts ...grpc.CallOption) (*Events, error)
 	GetEventMonth(ctx context.Context, in *StartDate, opts ...grpc.CallOption) (*Events, error)
 	GetEventWeek(ctx context.Context, in *StartDate, opts ...grpc.CallOption) (*Events, error)
@@ -38,8 +39,8 @@ func NewMyServClient(cc grpc.ClientConnInterface) MyServClient {
 	return &myServClient{cc}
 }
 
-func (c *myServClient) CreateEvent(ctx context.Context, in *ForCreate, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
+func (c *myServClient) CreateEvent(ctx context.Context, in *ForCreate, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/event.myServ/CreateEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -47,8 +48,8 @@ func (c *myServClient) CreateEvent(ctx context.Context, in *ForCreate, opts ...g
 	return out, nil
 }
 
-func (c *myServClient) UpdateEvent(ctx context.Context, in *ForUpdate, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
+func (c *myServClient) UpdateEvent(ctx context.Context, in *ForUpdate, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/event.myServ/UpdateEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -56,8 +57,8 @@ func (c *myServClient) UpdateEvent(ctx context.Context, in *ForUpdate, opts ...g
 	return out, nil
 }
 
-func (c *myServClient) DeleteEvent(ctx context.Context, in *ForDelete, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
+func (c *myServClient) DeleteEvent(ctx context.Context, in *ForDelete, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/event.myServ/DeleteEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,9 +97,9 @@ func (c *myServClient) GetEventWeek(ctx context.Context, in *StartDate, opts ...
 // All implementations must embed UnimplementedMyServServer
 // for forward compatibility
 type MyServServer interface {
-	CreateEvent(context.Context, *ForCreate) (*Error, error)
-	UpdateEvent(context.Context, *ForUpdate) (*Error, error)
-	DeleteEvent(context.Context, *ForDelete) (*Error, error)
+	CreateEvent(context.Context, *ForCreate) (*empty.Empty, error)
+	UpdateEvent(context.Context, *ForUpdate) (*empty.Empty, error)
+	DeleteEvent(context.Context, *ForDelete) (*empty.Empty, error)
 	GetEventByDate(context.Context, *StartDate) (*Events, error)
 	GetEventMonth(context.Context, *StartDate) (*Events, error)
 	GetEventWeek(context.Context, *StartDate) (*Events, error)
@@ -109,13 +110,13 @@ type MyServServer interface {
 type UnimplementedMyServServer struct {
 }
 
-func (UnimplementedMyServServer) CreateEvent(context.Context, *ForCreate) (*Error, error) {
+func (UnimplementedMyServServer) CreateEvent(context.Context, *ForCreate) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEvent not implemented")
 }
-func (UnimplementedMyServServer) UpdateEvent(context.Context, *ForUpdate) (*Error, error) {
+func (UnimplementedMyServServer) UpdateEvent(context.Context, *ForUpdate) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateEvent not implemented")
 }
-func (UnimplementedMyServServer) DeleteEvent(context.Context, *ForDelete) (*Error, error) {
+func (UnimplementedMyServServer) DeleteEvent(context.Context, *ForDelete) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEvent not implemented")
 }
 func (UnimplementedMyServServer) GetEventByDate(context.Context, *StartDate) (*Events, error) {

@@ -12,8 +12,8 @@ import (
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/app"
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/logger"
 
-	//	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
 	internalhttpGRPC "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/HTTP_GRPC"
+	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/memory"
 	sqlstorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/sql"
 )
@@ -26,9 +26,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-
 	if flag.Arg(0) == "version" {
-		printVersion()
 		return
 	}
 	fmt.Println(flag.Args(), configFile)
@@ -61,11 +59,11 @@ func main() {
 	}
 	calendar.Logg.Info("Get new calendar:", calendar)
 
-	//server := internalhttp.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
-	server := internalhttpGRPC.NewServer( /*logg,*/ calendar, config.HTTP.Host+":"+config.HTTP.Port)
-	fmt.Println("server=", server)
+	server := internalhttp.NewServer(calendar, config.HTTP.Host+":"+config.HTTP.Port)
+	serverGRPC := internalhttpGRPC.NewServer(calendar, config.GRPC.Host+":"+config.GRPC.Port)
 
 	calendar.Logg.Info("server:", server)
+	calendar.Logg.Info("serverGRPC:", serverGRPC)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -80,14 +78,29 @@ func main() {
 		if err := server.Stop(ctx); err != nil {
 			logg.Error("failed to stop http server: " + err.Error())
 		}
+		if err := serverGRPC.Stop(ctx); err != nil {
+			logg.Error("failed to stop http server: " + err.Error())
+		}
+
 	}()
 
 	logg.Info("calendar is running...")
-
-	if err := server.Start(ctx); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
-		cancel()
-		os.Exit(1) //nolint:gocritic
-	}
+	go func() {
+		if err := server.Start(ctx); err != nil {
+			logg.Error("failed to start http server: " + err.Error())
+			cancel()
+			os.Exit(1) //nolint:gocritic
+		}
+	}()
+	go func() {
+		if err := serverGRPC.Start(ctx); err != nil {
+			logg.Error("failed to start GRPC server: " + err.Error())
+			cancel()
+			os.Exit(1) //nolint:gocritic
+		}
+	}()
+	time.Sleep(time.Second * 120)
+	fmt.Println("Finish")
+	//	<-ctx.Done()
 	logg.Info("Finish")
 }

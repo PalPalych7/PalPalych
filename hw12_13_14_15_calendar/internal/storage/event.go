@@ -17,9 +17,8 @@ type Event struct {
 	ID        string
 	Title     string
 	StartDate time.Time
-	//	EndtDate  time.Time
-	Details string
-	UserID  int
+	Details   string
+	UserID    int
 }
 
 type EventList struct {

@@ -9,6 +9,7 @@ import (
 
 	st "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage"
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/pb"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -58,43 +59,25 @@ func eventToRes(procEvents []st.Event) []*pb.OneEvent {
 	return myEvents
 }
 
-func (s *Service) CreateEvent(ctx context.Context, req *pb.ForCreate) (*pb.Error, error) {
+func (s *Service) CreateEvent(ctx context.Context, req *pb.ForCreate) (*empty.Empty, error) {
 	myErr := s.myServer.App.CreateEvent(ctx, req.Title, req.StartDate, req.Details, int(req.UserID))
-	Resp := &pb.Error{}
-	if myErr == nil {
-		Resp.ErrorText = "OK"
-	} else {
-		Resp.ErrorText = myErr.Error()
-	}
 	writeLogResult(ctx, "CreateEvent", s.myServer.App)
-	s.myServer.App.Print("Response=", Resp)
-	return Resp, nil
+	s.myServer.App.Print(myErr)
+	return nil, myErr
 }
 
-func (s *Service) UpdateEvent(ctx context.Context, req *pb.ForUpdate) (*pb.Error, error) {
+func (s *Service) UpdateEvent(ctx context.Context, req *pb.ForUpdate) (*empty.Empty, error) {
 	myErr := s.myServer.App.UpdateEvent(ctx, req.EventID, req.Title, req.StartDate, req.Details, int(req.UserID))
-	Resp := &pb.Error{}
-	if myErr == nil {
-		Resp.ErrorText = "OK"
-	} else {
-		Resp.ErrorText = myErr.Error()
-	}
 	writeLogResult(ctx, "UpdateEvent", s.myServer.App)
-	s.myServer.App.Print("Response=", Resp)
-	return Resp, nil
+	s.myServer.App.Print(myErr)
+	return nil, myErr
 }
 
-func (s *Service) DeleteEvent(ctx context.Context, req *pb.ForDelete) (*pb.Error, error) {
-	Resp := &pb.Error{}
+func (s *Service) DeleteEvent(ctx context.Context, req *pb.ForDelete) (*empty.Empty, error) {
 	myErr := s.myServer.App.DeleteEvent(ctx, req.EventID)
-	if myErr == nil {
-		Resp.ErrorText = "OK"
-	} else {
-		Resp.ErrorText = myErr.Error()
-	}
 	writeLogResult(ctx, "DeleteEvent", s.myServer.App)
-	s.myServer.App.Print("Response=", Resp)
-	return Resp, nil
+	s.myServer.App.Print(myErr)
+	return nil, myErr
 }
 
 func (s *Service) GetEventByDate(ctx context.Context, req *pb.StartDate) (*pb.Events, error) {
@@ -156,8 +139,8 @@ type Application interface {
 	Error(args ...interface{})
 }
 
-func NewServer( /*logger Logger,*/ app Application, httpConf string) *Server {
-	return &Server{App: app /*Logg: logger,*/, HTTPConf: httpConf}
+func NewServer(app Application, httpConf string) *Server {
+	return &Server{App: app, HTTPConf: httpConf}
 }
 
 func (s *Server) Start(ctx context.Context) error {
@@ -165,14 +148,13 @@ func (s *Server) Start(ctx context.Context) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("lsn=", lsn)
-	s.App.Info("serv=", s.HTTPConf)
+	fmt.Println("GRPCserv=", s.HTTPConf)
+	s.App.Info("GRPCserv=", s.HTTPConf)
 	s.MyHTTP = grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			myMiddleware(ValidateReq),
 		),
 	)
-	fmt.Println("server=", s.MyHTTP)
 	fmt.Println("*s=", *s)
 	myService := &Service{myServer: *s}
 	pb.RegisterMyServServer(s.MyHTTP, myService)

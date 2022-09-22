@@ -1,13 +1,13 @@
 syntax = "proto3";
-
+import "google/protobuf/empty.proto";
 package event;
 
 option go_package = "./;pb";
 
 service myServ {
-  rpc CreateEvent    (ForCreate)  returns (Error) {}
-  rpc UpdateEvent    (ForUpdate)  returns (Error) {}
-  rpc DeleteEvent    (ForDelete)  returns (Error) {}
+  rpc CreateEvent    (ForCreate)  returns (google.protobuf.Empty) {}
+  rpc UpdateEvent    (ForUpdate)  returns (google.protobuf.Empty) {}
+  rpc DeleteEvent    (ForDelete)  returns (google.protobuf.Empty) {}
   rpc GetEventByDate (StartDate) returns (Events) {}
   rpc GetEventMonth  (StartDate) returns (Events) {}
   rpc GetEventWeek   (StartDate) returns (Events) {}
@@ -15,10 +15,6 @@ service myServ {
 
 message StartDate {
   string StartDateStr  = 1;       
-}
-
-message Error {
-  string ErrorText  = 1;       
 }
 
 message ForCreate {
