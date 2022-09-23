@@ -10,7 +10,7 @@ import (
 
 var (
 	ErrDate           = errors.New("invalid Date format")
-	EventIDIsNotFound = errors.New("eventID not found") // nolint
+	EventIDIsNotFound = errors.New("eventID not found") //nolint
 	ErrNotBeginMonth  = errors.New("date is not Begin Month")
 	ErrNotBeginWeek   = errors.New("date is not Begin Week")
 )

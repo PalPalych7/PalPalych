@@ -11,7 +11,6 @@ import (
 
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/app"
 	"github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/logger"
-
 	internalhttpGRPC "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/HTTP_GRPC"
 	internalhttp "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/PalPalych7/PalPalych/hw12_13_14_15_calendar/internal/storage/memory"
@@ -81,7 +80,6 @@ func main() {
 		if err := serverGRPC.Stop(ctx); err != nil {
 			logg.Error("failed to stop http server: " + err.Error())
 		}
-
 	}()
 
 	logg.Info("calendar is running...")
@@ -89,14 +87,14 @@ func main() {
 		if err := server.Start(ctx); err != nil {
 			logg.Error("failed to start http server: " + err.Error())
 			cancel()
-			os.Exit(1) //nolint:gocritic
+			os.Exit(1)
 		}
 	}()
 	go func() {
 		if err := serverGRPC.Start(ctx); err != nil {
 			logg.Error("failed to start GRPC server: " + err.Error())
 			cancel()
-			os.Exit(1) //nolint:gocritic
+			os.Exit(1)
 		}
 	}()
 	time.Sleep(time.Second * 120)

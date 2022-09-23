@@ -101,10 +101,10 @@ func (s *Storage) GetEventByDate(startDateStr string) ([]st.Event, error) {
     `
 
 	rows, err := s.DBConnect.Query(query, startDateStr)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	myEventList, newErr := rowsToStruct(rows)
 	return myEventList, newErr
 }
@@ -125,10 +125,10 @@ func (s *Storage) GetEventMonth(startDateStr string) ([]st.Event, error) {
 		where date_trunc('month',StartDate)=to_date($1,'DD.MM.YYYY')
 	`
 	rows, err := s.DBConnect.Query(query, startDateStr)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	myEventList, newErr := rowsToStruct(rows)
 	return myEventList, newErr
 }
@@ -149,10 +149,10 @@ func (s *Storage) GetEventWeek(startDateStr string) ([]st.Event, error) {
 		where date_trunc('week',StartDate)=to_date($1,'DD.MM.YYYY')
 	`
 	rows, err := s.DBConnect.Query(query, startDateStr)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	myEventList, newErr := rowsToStruct(rows)
 	return myEventList, newErr
 }

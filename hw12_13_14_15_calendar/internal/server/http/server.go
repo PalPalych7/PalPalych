@@ -37,12 +37,12 @@ func NewServer(app Application, httpConf string) *Server {
 	return &Server{App: app, HTTPConf: httpConf}
 }
 
-func getBodyRow(req_body io.ReadCloser) []byte {
-	raw, err := ioutil.ReadAll(req_body)
+func getBodyRow(reqBody io.ReadCloser) []byte {
+	raw, err := ioutil.ReadAll(reqBody)
 	if err != nil {
 		return nil
 	}
-	defer req_body.Close()
+	defer reqBody.Close()
 	return raw
 }
 
@@ -52,20 +52,20 @@ func (s *Server) CreateEventFunc(rw http.ResponseWriter, req *http.Request) {
 	if myRaw == nil {
 		s.App.Error("Ошибка обработки тела запроса")
 		rw.WriteHeader(http.StatusInternalServerError)
-	} else {
-		myStruct := ForCreate{}
-		if err := json.Unmarshal(myRaw, &myStruct); err != nil {
-			s.App.Error("Ошибка перевода json в структуру")
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			myErr := s.App.CreateEvent(s.myCtx, myStruct.Title, myStruct.StartDate, myStruct.Details, int(myStruct.UserID))
-			if myErr != nil {
-				s.App.Error(myErr)
-				rw.WriteHeader(http.StatusInternalServerError)
-			}
-		}
+		return
 	}
-	return
+	myStruct := ForCreate{}
+	if err := json.Unmarshal(myRaw, &myStruct); err != nil {
+		s.App.Info(myRaw)
+		s.App.Error("Ошибка перевода json в структуру - " + err.Error())
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	myErr := s.App.CreateEvent(s.myCtx, myStruct.Title, myStruct.StartDate, myStruct.Details, int(myStruct.UserID))
+	if myErr != nil {
+		s.App.Error(myErr)
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) UpdateEventFunc(rw http.ResponseWriter, req *http.Request) {
@@ -74,21 +74,20 @@ func (s *Server) UpdateEventFunc(rw http.ResponseWriter, req *http.Request) {
 	if myRaw == nil {
 		s.App.Error("Ошибка обработки тела запроса")
 		rw.WriteHeader(http.StatusInternalServerError)
-	} else {
-		myStruct := ForUpdate{}
-		if err := json.Unmarshal(myRaw, &myStruct); err != nil {
-			s.App.Error("Ошибка перевода json в структуру")
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			fmt.Println("myStruct=", myStruct)
-			myErr := s.App.UpdateEvent(s.myCtx, myStruct.EventID, myStruct.Title, myStruct.StartDate, myStruct.Details, int(myStruct.UserID))
-			if myErr != nil {
-				s.App.Error(myErr)
-				rw.WriteHeader(http.StatusInternalServerError)
-			}
-		}
+		return
 	}
-	return
+	myStruct := ForUpdate{}
+	if err := json.Unmarshal(myRaw, &myStruct); err != nil {
+		s.App.Error("Ошибка перевода json в структуру")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("myStruct=", myStruct)
+	myErr := s.App.UpdateEvent(s.myCtx, myStruct.EventID, myStruct.Title, myStruct.StartDate, myStruct.Details, int(myStruct.UserID)) //nolint
+	if myErr != nil {
+		s.App.Error(myErr)
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) DeleteEventFunc(rw http.ResponseWriter, req *http.Request) {
@@ -97,113 +96,109 @@ func (s *Server) DeleteEventFunc(rw http.ResponseWriter, req *http.Request) {
 	if myRaw == nil {
 		s.App.Error("Ошибка обработки тела запроса")
 		rw.WriteHeader(http.StatusInternalServerError)
-	} else {
-		myStruct := ForDelete{}
-		if err := json.Unmarshal(myRaw, &myStruct); err != nil {
-			s.App.Error("Ошибка перевода json в структуру")
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			myErr := s.App.DeleteEvent(s.myCtx, myStruct.EventID)
-			if myErr != nil {
-				s.App.Error(myErr)
-				rw.WriteHeader(http.StatusInternalServerError)
-			}
-		}
+		return
 	}
-	return
+	myStruct := ForDelete{}
+	if err := json.Unmarshal(myRaw, &myStruct); err != nil {
+		s.App.Error("Ошибка перевода json в структуру")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	myErr := s.App.DeleteEvent(s.myCtx, myStruct.EventID)
+	if myErr != nil {
+		s.App.Error(myErr)
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
-func (s *Server) GetEventByDateFunc(rw http.ResponseWriter, req *http.Request) {
+func (s *Server) GetEventByDateFunc(rw http.ResponseWriter, req *http.Request) { //nolint:dupl
 	s.App.Info("GetEventByDate")
 	myRaw := getBodyRow(req.Body)
 	if myRaw == nil {
 		s.App.Error("Ошибка обработки тела запроса")
 		rw.WriteHeader(http.StatusInternalServerError)
-	} else {
-		myStruct := StartDate{}
-		if err := json.Unmarshal(myRaw, &myStruct); err != nil {
-			s.App.Error("Ошибка перевода json в структуру")
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			eventList, myErr := s.App.GetEventByDate(s.myCtx, myStruct.StartDateStr)
-			if myErr == nil {
-				rawResp, err3 := json.Marshal(eventList)
-				if err3 == nil {
-					rw.Write(rawResp)
-				} else {
-					rw.WriteHeader(http.StatusInternalServerError)
-					s.App.Error(err3)
-				}
-			} else {
-				rw.WriteHeader(http.StatusInternalServerError)
-				s.App.Error(myErr)
-
-			}
-		}
+		return
 	}
-	return
+	myStruct := StartDate{}
+	if err := json.Unmarshal(myRaw, &myStruct); err != nil {
+		s.App.Error("Ошибка перевода json в структуру")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	eventList, myErr := s.App.GetEventByDate(s.myCtx, myStruct.StartDateStr)
+	if myErr == nil {
+		rawResp, err3 := json.Marshal(eventList)
+		if err3 == nil {
+			rw.Write(rawResp)
+		} else {
+			rw.WriteHeader(http.StatusInternalServerError)
+			s.App.Error(err3)
+			return
+		}
+	} else {
+		rw.WriteHeader(http.StatusInternalServerError)
+		s.App.Error(myErr)
+	}
 }
 
-func (s *Server) GetEventMonthFunc(rw http.ResponseWriter, req *http.Request) {
+func (s *Server) GetEventMonthFunc(rw http.ResponseWriter, req *http.Request) { //nolint:dupl
 	s.App.Info("GetEventMonth")
 	myRaw := getBodyRow(req.Body)
 	if myRaw == nil {
-		s.App.Error("Ошибка обработки тела запроса")
+		s.App.Error("Ошибка обработки тела запроса!")
 		rw.WriteHeader(http.StatusInternalServerError)
-	} else {
-		myStruct := StartDate{}
-		if err := json.Unmarshal(myRaw, &myStruct); err != nil {
-			s.App.Error("Ошибка перевода json в структуру")
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			eventList, myErr := s.App.GetEventMonth(s.myCtx, myStruct.StartDateStr)
-			if myErr == nil {
-				rawResp, err3 := json.Marshal(eventList)
-				if err3 == nil {
-					rw.Write(rawResp)
-				} else {
-					rw.WriteHeader(http.StatusInternalServerError)
-					s.App.Error(err3)
-				}
-			} else {
-				rw.WriteHeader(http.StatusInternalServerError)
-				s.App.Error(myErr)
-
-			}
-		}
+		return
 	}
-	return
+	myStruct := StartDate{}
+	if err := json.Unmarshal(myRaw, &myStruct); err != nil {
+		s.App.Error("Ошибка перевода json в структуру!")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	eventList, myErr := s.App.GetEventMonth(s.myCtx, myStruct.StartDateStr)
+	if myErr == nil {
+		rawResp, err3 := json.Marshal(eventList)
+		if err3 == nil {
+			rw.Write(rawResp)
+		} else {
+			rw.WriteHeader(http.StatusInternalServerError)
+			s.App.Error(err3)
+			return
+		}
+	} else {
+		rw.WriteHeader(http.StatusInternalServerError)
+		s.App.Error(myErr)
+	}
 }
 
-func (s *Server) GetEventByWeekFunc(rw http.ResponseWriter, req *http.Request) {
+func (s *Server) GetEventByWeekFunc(rw http.ResponseWriter, req *http.Request) { //nolint:dupl
 	s.App.Info("GetEventByWeekFunc")
 	myRaw := getBodyRow(req.Body)
 	if myRaw == nil {
 		s.App.Error("Ошибка обработки тела запроса")
 		rw.WriteHeader(http.StatusInternalServerError)
-	} else {
-		myStruct := StartDate{}
-		if err := json.Unmarshal(myRaw, &myStruct); err != nil {
-			s.App.Error("Ошибка перевода json в структуру")
-			rw.WriteHeader(http.StatusInternalServerError)
-		} else {
-			eventList, myErr := s.App.GetEventWeek(s.myCtx, myStruct.StartDateStr)
-			if myErr == nil {
-				rawResp, err3 := json.Marshal(eventList)
-				if err3 == nil {
-					rw.Write(rawResp)
-				} else {
-					rw.WriteHeader(http.StatusInternalServerError)
-					s.App.Error(err3)
-				}
-			} else {
-				rw.WriteHeader(http.StatusInternalServerError)
-				s.App.Error(myErr)
-
-			}
-		}
+		return
 	}
-	return
+	myStruct := StartDate{}
+	if err := json.Unmarshal(myRaw, &myStruct); err != nil {
+		s.App.Error("Ошибка перевода json в структуру")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	eventList, myErr := s.App.GetEventWeek(s.myCtx, myStruct.StartDateStr)
+	if myErr == nil {
+		rawResp, err3 := json.Marshal(eventList)
+		if err3 == nil {
+			rw.Write(rawResp)
+		} else {
+			rw.WriteHeader(http.StatusInternalServerError)
+			s.App.Error(err3)
+			return
+		}
+	} else {
+		rw.WriteHeader(http.StatusInternalServerError)
+		s.App.Error(myErr)
+	}
 }
 
 func (s *Server) Start(ctx context.Context) error {
@@ -220,7 +215,7 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("/GetEventByDate", s.GetEventByDateFunc)
 	mux.HandleFunc("/GetEventMonth", s.GetEventMonthFunc)
 	mux.HandleFunc("/GetEventWeek", s.GetEventByWeekFunc)
-	http.ListenAndServe(s.MyHTTP.Addr, s.loggingMiddleware(mux))
+	http.ListenAndServe(s.MyHTTP.Addr, s.loggingMiddleware(mux)) //nolint
 	<-ctx.Done()
 	return nil
 }
