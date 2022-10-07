@@ -97,8 +97,6 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-	time.Sleep(time.Second * 120)
-	fmt.Println("Finish")
-	//	<-ctx.Done()
+	<-ctx.Done()
 	logg.Info("Finish")
 }
