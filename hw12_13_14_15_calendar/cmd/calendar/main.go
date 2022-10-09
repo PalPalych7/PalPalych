@@ -20,7 +20,8 @@ import (
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/home/palpalych/calend/config.toml", "Path to configuration file")
+	//	flag.StringVar(&configFile, "config", "/home/palpalych/calend/calendar_config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "../../configs/calendar_config.toml", "Path to configuration file")
 }
 
 func main() {
@@ -97,6 +98,7 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-	<-ctx.Done()
+	//	<-ctx.Done()
+	time.Sleep(time.Second * 120)
 	logg.Info("Finish")
 }
