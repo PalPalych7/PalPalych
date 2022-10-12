@@ -1,0 +1,16 @@
+[Logger]
+Level = "TRACE"
+LogFile="/home/palpalych/calend/main.log"
+[Storage]
+StorageType="sql"
+[DB]
+DbName="hw12" 
+DbUserName="otus1" 
+DbPassword="123456"
+
+[Http]
+Host="127.0.0.103"
+Port="5000"
+[GRPC]
+Host="127.0.0.20"
+Port="8080"
