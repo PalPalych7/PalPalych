@@ -99,6 +99,6 @@ func main() {
 		}
 	}()
 	//	<-ctx.Done()
-	time.Sleep(time.Second * 120)
+	time.Sleep(time.Second * 150)
 	logg.Info("Finish")
 }
