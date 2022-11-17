@@ -17,11 +17,11 @@ type Config struct {
 	Rabbit rabbitq.RabbitCFG
 }
 
-func NewConfig(configFile string) Config {
+func NewConfig(configFile string) (Config, error) {
 	var myConf Config
 	_, err := toml.DecodeFile(configFile, &myConf)
 	if err != nil {
 		fmt.Println("err Decode config File=", err)
 	}
-	return myConf
+	return myConf, err
 }

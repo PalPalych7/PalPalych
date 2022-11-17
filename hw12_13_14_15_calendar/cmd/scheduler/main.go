@@ -23,8 +23,11 @@ func init() {
 func main() {
 	flag.Parse()
 	fmt.Println(flag.Args(), configFile)
-	config := NewConfig(configFile)
-	fmt.Println("config=", config)
+	config, err := NewConfig(configFile)
+	fmt.Println("config=", config, err)
+	if err != nil {
+		return
+	}
 	logg := logger.New(config.Logger.LogFile, config.Logger.Level)
 	fmt.Println(config.Logger.Level)
 	fmt.Println("logg=", logg)
@@ -34,7 +37,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
-	err := storage.Connect(ctx)
+	err = storage.Connect(ctx)
 	if err != nil {
 		logg.Fatal(err.Error())
 	}

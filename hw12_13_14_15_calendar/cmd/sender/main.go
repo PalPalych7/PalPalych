@@ -20,7 +20,11 @@ func init() {
 func main() {
 	flag.Parse()
 	fmt.Println(flag.Args(), configFile)
-	config := NewConfig(configFile)
+	config, err := NewConfig(configFile)
+	fmt.Println("config=", config, err)
+	if err != nil {
+		return
+	}
 	fmt.Println("config=", config)
 	logg := logger.New(config.Logger.LogFile, config.Logger.Level)
 	fmt.Println(config.Logger.Level)
