@@ -2,12 +2,14 @@ package hw02unpackstring
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestUnpack(t *testing.T) {
+	fmt.Println("strt")
 	tests := []struct {
 		input    string
 		expected string
@@ -38,7 +40,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func TestUnpackInvalidString(t *testing.T) {
-	invalidStrings := []string{"3abc", "45", "aaa10b"}
+	invalidStrings := []string{"3abc", "45", "aaa10b", "10\n"}
 	for _, tc := range invalidStrings {
 		tc := tc
 		t.Run(tc, func(t *testing.T) {

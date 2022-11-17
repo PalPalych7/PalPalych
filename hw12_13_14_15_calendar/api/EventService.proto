@@ -1,7 +1,52 @@
 syntax = "proto3";
-
+import "google/protobuf/empty.proto";
 package event;
 
-message Event {
-    // TODO
+option go_package = "./;pb";
+
+service myServ {
+  rpc CreateEvent    (ForCreate)  returns (google.protobuf.Empty) {}
+  rpc UpdateEvent    (ForUpdate)  returns (google.protobuf.Empty) {}
+  rpc DeleteEvent    (ForDelete)  returns (google.protobuf.Empty) {}
+  rpc GetEventByDate (StartDate) returns (Events) {}
+  rpc GetEventMonth  (StartDate) returns (Events) {}
+  rpc GetEventWeek   (StartDate) returns (Events) {}
+}
+
+message StartDate {
+  string StartDateStr  = 1;       
+}
+
+message ForCreate {
+  string Title     = 2;    
+  string StartDate = 3;  //
+  string Details   = 4;  
+  uint32 UserID    = 5; 
+}
+
+message ForUpdate {
+  string EventID   = 1;       
+  string Title     = 2;    
+  string StartDate = 3;  //
+  string Details   = 4;  
+  uint32 UserID    = 5; 
+}
+
+message ForDelete {
+  string EventID   = 1;       
+}  
+
+message OneEvent {
+    string EventID   = 1;       
+    string Title     = 2;    
+    string StartDate = 3;  //
+    string Details   = 4;  
+    uint32 UserID    = 5; 
+}
+
+
+
+message Events {
+  repeated OneEvent Result = 1;   
+  string ErrorText         = 2;  
 }

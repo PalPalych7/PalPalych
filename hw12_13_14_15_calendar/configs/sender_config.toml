@@ -1,0 +1,10 @@
+[Logger]
+Level="TRACE"
+LogFile="/home/palpalych/calend/sender.log"
+[Rabbit]
+uri="amqp://guest:guest@localhost:5672/"
+exchange="calend_shed"
+exchangeType="direct"
+queue="queue1"
+bindingKey="myKey"
+consumerTag="simple-consumer"

@@ -1,0 +1,13 @@
+[Logger]
+Level="TRACE"
+LogFile="/home/palpalych/calend/schedule.log"
+[DB]
+DbName="hw12" 
+DbUserName="otus1" 
+DbPassword="123456"
+[Rabbit]
+uri="amqp://guest:guest@localhost:5672/"
+exchange="calend_shed"
+exchangeType="direct"
+queue="queue1"
+bindingKey="myKey"

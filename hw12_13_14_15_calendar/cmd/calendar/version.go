@@ -6,13 +6,12 @@ import (
 	"os"
 )
 
-var (
-	release   = "UNKNOWN"
-	buildDate = "UNKNOWN"
-	gitHash   = "UNKNOWN"
-)
-
-func printVersion() {
+func printVersion() { //nolint
+	var (
+		release   = "UNKNOWN"
+		buildDate = "UNKNOWN"
+		gitHash   = "UNKNOWN"
+	)
 	if err := json.NewEncoder(os.Stdout).Encode(struct {
 		Release   string
 		BuildDate string
