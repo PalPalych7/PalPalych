@@ -85,7 +85,7 @@ func (s *mySuite) CheckCountRecBind(expCount int, myQueryText string, arg interf
 	s.Require().Equal(expCount, countRec)
 }
 
-func (s *mySuite) GetMaxValBind(myQueryText string, arg any) string {
+func (s *mySuite) GetMaxValBind(myQueryText string, arg interface{}) string {
 	var maxVal string
 	mySQLRows, err := s.DBConnect.QueryContext(s.ctx, myQueryText, arg)
 	s.Require().NoError(err)
