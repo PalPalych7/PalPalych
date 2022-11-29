@@ -64,13 +64,13 @@ var (
 
 func (s *mySuite) CheckCountRec(expCount int, myQueryText string) {
 	mySQLRows, err := s.DBConnect.QueryContext(s.ctx, myQueryText)
-	s.Require().NoError(err) //nolint
+	s.Require().NoError(err)
 	defer mySQLRows.Close()
 	mySQLRows.Next()
 	err = mySQLRows.Scan(&countRec)
 	fmt.Println("countRec=", countRec)
-	s.Require().NoError(err)              //nolint
-	s.Require().Equal(expCount, countRec) //nolint
+	s.Require().NoError(err)
+	s.Require().Equal(expCount, countRec)
 }
 
 func (s *mySuite) CheckCountRecBind(expCount int, myQueryText string, arg interface{}) {
