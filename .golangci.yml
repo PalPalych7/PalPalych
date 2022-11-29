@@ -17,6 +17,7 @@ issues:
         - dupl
         - gocyclo
         - gosec
+        - typecheck
 
 linters:
   disable-all: true
@@ -65,7 +66,7 @@ linters:
     - stylecheck
     - tagliatelle
     - thelper
-#    - typecheck
+    - typecheck
     - unconvert
     - unparam
     - unused
