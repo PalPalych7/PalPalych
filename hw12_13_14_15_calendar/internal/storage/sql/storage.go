@@ -22,19 +22,25 @@ type Storage struct {
 	DBName     string
 	DBUserName string
 	DBPassword string
+	DBHost     string
+	DBPort     string
 	DBConnect  *sql.DB
 }
 
-func New(dbName, dbUserName, dbPassword string) *Storage {
+func New(dbName, dbUserName, dbPassword, dbHost, dbPort string) *Storage {
 	return &Storage{
-		DBName: dbName, DBUserName: dbUserName, DBPassword: dbPassword,
+		DBName: dbName, DBUserName: dbUserName, DBPassword: dbPassword, DBHost: dbHost, DBPort: dbPort,
 	}
 }
 
 func (s *Storage) Connect(ctx context.Context) error {
 	var err error
-	myStr := "user=" + s.DBUserName + " dbname=" + s.DBName + " password=" + s.DBPassword + " sslmode=disable"
+	//	myStr := "user=" + s.DBUserName + " dbname=" + s.DBName + " password=" + s.DBPassword + " sslmode=disable"
+	//	s.DBConnect, err = sql.Open("postgres", myStr)
+	myStr := "postgres://" + s.DBUserName + ":" + s.DBPassword + "@"
+	myStr += s.DBHost + ":" + s.DBPort + "/" + s.DBName + "?sslmode=disable"
 	s.DBConnect, err = sql.Open("postgres", myStr)
+
 	if err == nil {
 		err = s.DBConnect.PingContext(ctx)
 	}
@@ -155,6 +161,31 @@ func (s *Storage) GetEventWeek(startDateStr string) ([]st.Event, error) {
 	defer rows.Close()
 	myEventList, newErr := rowsToStruct(rows)
 	return myEventList, newErr
+}
+
+func (s *Storage) GetNotSendEventByDate(startDateStr string) ([]st.Event, error) {
+	query := `
+		select ID, Title, StartDate, Details,UserID
+		from events
+		where StartDate=to_date($1,'DD.MM.YYYY')
+		  and id not in (select event_id from shed_send_id)
+    `
+	rows, err := s.DBConnect.Query(query, startDateStr)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	myEventList, newErr := rowsToStruct(rows)
+	return myEventList, newErr
+}
+
+func (s *Storage) SetSendMessID(messID string) error {
+	query := `
+	   insert into shed_send_id(event_id)
+	   values($1)
+	`
+	_, err := s.DBConnect.Exec(query, messID)
+	return err
 }
 
 func (s *Storage) Close(ctx context.Context) error {

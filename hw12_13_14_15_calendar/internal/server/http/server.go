@@ -204,6 +204,7 @@ func (s *Server) GetEventByWeekFunc(rw http.ResponseWriter, req *http.Request) {
 func (s *Server) Start(ctx context.Context) error {
 	fmt.Printf("serv=%#v", s.HTTPConf)
 	s.MyHTTP.Addr = s.HTTPConf
+	//	s.myHTTP.Addr = ":" + s.HTTPConf.Port
 	s.myCtx = ctx
 	fmt.Println("serv=", s.HTTPConf)
 	s.App.Info("serv=", s.HTTPConf)

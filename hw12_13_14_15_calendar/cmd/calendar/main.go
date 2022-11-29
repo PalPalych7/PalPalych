@@ -48,7 +48,7 @@ func main() {
 		calendar = app.New(logg, storage)
 	} else {
 		logg.Info("Work with sql")
-		storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword)
+		storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword, config.DB.DBHost, config.DB.DBPort) //nolint
 		logg.Info("Get new storage:", storage)
 		err := storage.Connect(context.Background())
 		if err != nil {
@@ -62,8 +62,8 @@ func main() {
 	}
 	calendar.Logg.Info("Get new calendar:", calendar)
 
-	server := internalhttp.NewServer(calendar, config.HTTP.Host+":"+config.HTTP.Port)
-	serverGRPC := internalhttpGRPC.NewServer(calendar, config.GRPC.Host+":"+config.GRPC.Port)
+	server := internalhttp.NewServer(calendar /*config.HTTP.Host+*/, ":"+config.HTTP.Port)
+	serverGRPC := internalhttpGRPC.NewServer(calendar /*config.GRPC.Host+*/, ":"+config.GRPC.Port)
 
 	calendar.Logg.Info("server:", server)
 	calendar.Logg.Info("serverGRPC:", serverGRPC)
@@ -101,7 +101,7 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-	//	<-ctx.Done()
-	time.Sleep(time.Second * 150)
+	<-ctx.Done()
+	//	time.Sleep(time.Second * 150)
 	logg.Info("Finish")
 }

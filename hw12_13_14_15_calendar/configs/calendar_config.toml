@@ -1,16 +1,20 @@
 [Logger]
 Level = "TRACE"
-LogFile="/home/palpalych/calend/main.log"
+LogFile="../main.log"
 [Storage]
 StorageType="sql"
+
 [DB]
-DbName="hw12" 
-DbUserName="otus1" 
-DbPassword="123456"
+DbHost="postgres_db" 
+DbPort="5432"
+DbName="calend" 
+DbUserName="calend" 
+DbPassword="calend"
 
 [Http]
 Host="127.0.0.103"
 Port="5000"
+
 [GRPC]
 Host="127.0.0.20"
 Port="8080"

@@ -1,15 +1,17 @@
-/* пока в полуручном режиме*/
-sudo systemctl start postgresql
-sudo -u postgres psql
-
-create database hw12;
-create user otus1 with encrypted password '123456';
-grant all privileges on database hw12 to otus1;
 create table events (
-    ID text primary key,
+    ID text PRIMARY KEY,
     Title text,
     StartDate date,
     Details text,
     UserID bigint
 );
-create index ind1 on event (StartDate);
+create index ind1 on events (StartDate);
+
+create table shed_send_id (
+    event_id text
+);
+
+create table send_events_stat (
+    event_ID text,
+    send_date TIMESTAMP default CURRENT_TIMESTAMP
+);

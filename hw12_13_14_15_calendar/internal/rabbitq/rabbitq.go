@@ -14,6 +14,7 @@ type RabbitCFG struct {
 	Queue        string
 	BindingKey   string
 	ConsumerTag  string
+	SleepSecond  int
 }
 
 type RabbitQueue struct {

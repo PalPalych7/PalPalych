@@ -32,7 +32,7 @@ func main() {
 	fmt.Println(config.Logger.Level)
 	fmt.Println("logg=", logg)
 	logg.Info("Start!")
-	storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword)
+	storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword, config.DB.DBHost, config.DB.DBPort) //nolint
 	logg.Info("Connected to storage:", storage)
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -55,22 +55,27 @@ func main() {
 			currDate := time.Now()
 			currDateStr := currDate.Format("02.01.2006")
 			lastYearStr := currDate.AddDate(-1, 0, 0).Format("02.01.2006")
-			logg.Info("Проснулись. Сегодня ", currDateStr)
+			logg.Debug("I not sleep:)", currDateStr)
 
-			// отпарвка оповещений
-			myEventList, err2 := storage.GetEventByDate(currDateStr)
+			// отпрaвка оповещений (ещё не отправленных)
+			myEventList, err2 := storage.GetNotSendEventByDate(currDateStr)
+
 			fmt.Println(myEventList, err2)
 			for _, myEvent := range myEventList {
 				fmt.Println(myEvent)
-				logg.Info("найдено сообщение для отправки - ", myEvent)
+				logg.Debug("find message for sending - ", myEvent)
 				myMess, errMarsh := json.Marshal(myEvent)
 				if errMarsh != nil {
-					logg.Error("ошибка json.Marshal", errMarsh)
+					logg.Error("error json.Marshal", errMarsh)
 				}
 				if erSemdMess := myRQ.SendMess(myMess); erSemdMess != nil {
-					logg.Error("ошибка отправки сообщения-", errMarsh)
+					logg.Error("send message error-", errMarsh)
 				} else {
-					logg.Info("сообщение успешно отпралвено")
+					logg.Info("message was successful sended")
+					// внесём сообщение в список "отправленных"
+					if err3 := storage.SetSendMessID(myEvent.ID); err3 != nil {
+						logg.Error("set information about sendung error -", err3)
+					}
 				}
 			}
 
@@ -79,14 +84,14 @@ func main() {
 			fmt.Println(myEventList, err2)
 			for _, myEvent := range myEventList {
 				fmt.Println(myEvent)
-				logg.Info("найдено событие для удаления - ", myEvent)
+				logg.Debug("found event for delete - ", myEvent)
 				if errDel := storage.DeleteEvent(myEvent.ID); errDel != nil {
-					logg.Error("ошибка удаления сообщения -", errDel)
+					logg.Error("delete error -", errDel)
 				} else {
-					logg.Info("событие успешно удалено")
+					logg.Info("event was successful deleted")
 				}
 			}
-			time.Sleep(time.Hour * 24)
+			time.Sleep(time.Second * time.Duration(config.Rabbit.SleepSecond))
 		}
 	}()
 	<-ctx.Done()

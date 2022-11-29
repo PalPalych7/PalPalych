@@ -29,6 +29,8 @@ type StorageConf struct {
 }
 
 type DBConf struct {
+	DBHost     string
+	DBPort     string
 	DBName     string
 	DBUserName string
 	DBPassword string
