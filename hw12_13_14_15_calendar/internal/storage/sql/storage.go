@@ -181,8 +181,15 @@ func (s *Storage) GetNotSendEventByDate(startDateStr string) ([]st.Event, error)
 
 func (s *Storage) SetSendMessID(messID string) error {
 	query := `
-	   insert into shed_send_id(event_id)
-	   values($1)
+	   insert into shed_send_id(event_id)  values($1)
+	`
+	_, err := s.DBConnect.Exec(query, messID)
+	return err
+}
+
+func (s *Storage) SendMessStat(messID string) error {
+	query := `
+		insert into send_events_stat(send_mess) values($1)
 	`
 	_, err := s.DBConnect.Exec(query, messID)
 	return err

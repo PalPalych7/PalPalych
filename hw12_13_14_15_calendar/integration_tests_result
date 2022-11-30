@@ -1,0 +1,14 @@
+...
+Attaching to calend_integration_test
+calend_integration_test | go: downloading github.com/jackc/pgx v3.6.2+incompatible
+calend_integration_test | go: downloading github.com/stretchr/testify v1.7.0
+calend_integration_test | go: downloading github.com/lib/pq v1.10.5
+calend_integration_test | go: downloading github.com/davecgh/go-spew v1.1.1
+calend_integration_test | go: downloading github.com/pmezard/go-difflib v1.0.0
+calend_integration_test | go: downloading gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+calend_integration_test | go: downloading github.com/pkg/errors v0.9.1
+calend_integration_test | go: downloading golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+calend_integration_test | go: downloading golang.org/x/text v0.3.3
+calend_integration_test exited with code 0
+
+

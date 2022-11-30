@@ -1,0 +1,8 @@
+time="2022-11-30T17:35:57+03:00" level=info msg="Start!"
+time="2022-11-30T17:35:57+03:00" level=fatal msg="dial tcp 127.0.0.1:5432: connect: connection refused"
+time="2022-11-30T17:57:56+03:00" level=info msg="Start!"
+time="2022-11-30T17:57:56+03:00" level=fatal msg="pq: role \"pp\" does not exist"
+time="2022-11-30T18:03:00+03:00" level=info msg="Start!"
+time="2022-11-30T18:03:00+03:00" level=fatal msg="pq: role \"pp\" does not exist"
+time="2022-11-30T18:04:00+03:00" level=info msg="Start!"
+time="2022-11-30T18:04:10+03:00" level=fatal msg="dial tcp: lookup postgres_db: Temporary failure in name resolution"

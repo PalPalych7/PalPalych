@@ -2,6 +2,13 @@
 Level="TRACE"
 LogFile="../sender.log"
 
+[DB]
+DbHost="postgres_db" 
+DbPort="5432"
+DbName="calend" 
+DbUserName="calend" 
+DbPassword="calend"
+
 [Rabbit]
 uri="amqp://guest:guest@rabbitmq:5672/"
 exchange="calend_shed"

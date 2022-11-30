@@ -12,6 +12,7 @@ create table shed_send_id (
 );
 
 create table send_events_stat (
-    event_ID text,
-    send_date TIMESTAMP default CURRENT_TIMESTAMP
+    send_date TIMESTAMP default CURRENT_TIMESTAMP,
+    send_mess text
+
 );

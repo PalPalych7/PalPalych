@@ -101,12 +101,12 @@ func (s *mySuite) SetupSuite() {
 		Timeout: time.Second * 5,
 	}
 
-	//	s.hostName = "http://mainSevice:5000/" // через докер
-	s.hostName = "http://localhost:5000/" // локально
+	s.hostName = "http://mainSevice:5000/" // через докер
+	//	s.hostName = "http://localhost:5000/" // локально
 	s.ctx = context.Background()
 
-	//	myStr := "postgres://calend:calend@postgres_db:5432/calend?sslmode=disable" // через докер
-	myStr := "postgres://calend:calend@localhost:5432/calend?sslmode=disable" // локально
+	myStr := "postgres://calend:calend@postgres_db:5432/calend?sslmode=disable" // через докер
+	//	myStr := "postgres://calend:calend@localhost:5432/calend?sslmode=disable" // локально
 
 	s.DBConnect, err = sql.Open("postgres", myStr)
 	if err == nil {
@@ -128,14 +128,13 @@ func (s *mySuite) SetupSuite() {
 }
 
 func (s *mySuite) TearDownSuite() {
-	//	mySQL := `
-	//			delete from events;
-	//			delete from shed_send_id;
-	//			delete from send_events_stat;
-	//		`
-	//	_, err = s.DBConnect.ExecContext(s.ctx, mySQL)
-	//	s.Require().NoError(err)
-	//
+	mySQL := `
+				delete from events;
+				delete from shed_send_id;
+				delete from send_events_stat;
+			`
+	_, err = s.DBConnect.ExecContext(s.ctx, mySQL)
+	s.Require().NoError(err)
 	s.DBConnect.Close()
 }
 
@@ -154,10 +153,6 @@ func (s *mySuite) SendRequest(myMethodName string, myAnyStruct interface{}) []by
 
 	return bodyRaw
 }
-
-// mux.HandleFunc("/GetEventByDate", s.GetEventByDateFunc)
-// mux.HandleFunc("/GetEventMonth", s.GetEventMonthFunc)
-// mux.HandleFunc("/GetEventWeek", s.GetEventByWeekFunc)
 
 func (s *mySuite) CreateEvent(myForCreate ForCreate) {
 	bodyRaw = s.SendRequest("CreateEvent", myForCreate)
@@ -276,8 +271,27 @@ func (s *mySuite) Test2GetEvent() {
 	s.Require().Equal(2, len(myEventList))
 	myEventList = s.GetEventMonth(StartDate{StartDateStr: constDate2}, false)
 	s.Require().Equal(3, len(myEventList))
-
 	fmt.Println("finish Test2")
+}
+
+func (s *mySuite) Test3SchedulerSender() {
+	fmt.Println("Start Test1")
+	constDate := time.Now().Format("02.01.2006")
+	mySQL := "select count(*) RC from events where StartDate=to_date($1,'DD.MM.YYYY')"
+	mySQL2 := "select count(*) RC from shed_send_id"
+	mySQL3 := "select count(*) RC from send_events_stat"
+	s.CheckCountRecBind(0, mySQL, constDate)
+	s.CheckCountRec(0, mySQL2)
+	s.CheckCountRec(0, mySQL3)
+
+	s.CreateEvent(ForCreate{Title: "newTitle", StartDate: constDate, Details: "newDetails", UserID: 1})
+	s.CheckCountRecBind(1, mySQL, constDate)
+	s.CheckCountRec(0, mySQL2)
+	s.CheckCountRec(0, mySQL3)
+
+	time.Sleep(time.Second * 35)
+	s.CheckCountRec(1, mySQL2)
+	s.CheckCountRec(1, mySQL3)
 }
 
 func TestService(t *testing.T) {

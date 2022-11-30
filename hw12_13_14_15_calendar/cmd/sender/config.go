@@ -12,8 +12,17 @@ type LoggerConf struct {
 	Level   string
 }
 
+type DBConf struct {
+	DBHost     string
+	DBPort     string
+	DBName     string
+	DBUserName string
+	DBPassword string
+}
+
 type Config struct {
 	Logger LoggerConf
+	DB     DBConf
 	Rabbit rabbitq.RabbitCFG
 }
 

@@ -33,7 +33,6 @@ func main() {
 	fmt.Println("logg=", logg)
 	logg.Info("Start!")
 	storage := sqlstorage.New(config.DB.DBName, config.DB.DBUserName, config.DB.DBPassword, config.DB.DBHost, config.DB.DBPort) //nolint
-	logg.Info("Connected to storage:", storage)
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
@@ -45,6 +44,7 @@ func main() {
 	if err != nil {
 		logg.Fatal(err.Error())
 	}
+	logg.Info("Connected to storage")
 	myRQ, err := rabbitq.CreateQueue(config.Rabbit, ctx)
 	if err != nil {
 		logg.Fatal(err.Error())
