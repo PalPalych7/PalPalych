@@ -53,14 +53,15 @@ build-compose: build-img_main build-img_scheduler build-img_sender build-img_int
 
 run_compose: build-compose
 	docker-compose up -d postgres_db 
+	docker-compose up -d rabbitmq
 	docker-compose up -d mainSevice 
-	docker-compose up -d scheduler
 	docker-compose up -d scheduler
 	docker-compose up -d sender
 
 up: run_compose
 
-down: build-compose down
+down: 
+	docker-compose down
 
 integration_tests: run_compose
 	docker-compose up integraton_test
