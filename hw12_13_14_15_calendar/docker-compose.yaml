@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  postgres_db:
+    container_name: calend_postgres
+    restart: always
+    image: postgres:13.3    
+    environment:
+      POSTGRES_DB: calend
+      POSTGRES_USER: calend
+      POSTGRES_PASSWORD: calend
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d
+#      - .:/var/lib/postgresql/data
+    ports:
+      - 5432:5432      
+  
+  rabbitmq:
+    container_name: calend_rabbitmq
+    restart: always
+    image: rabbitmq:3.6-management-alpine
+    ports:
+      - 15672:15672
+      - 5672:5672
+  
+  mainSevice:
+    container_name: calend_main
+    restart: always
+    image: calendar:develop
+    depends_on:
+      - postgres_db   
+    ports:
+      - 5000:5000 
+      - 8080:8080 
+  
+  sender:
+    container_name: calend_sender
+    restart: always
+    image: calendar_sender:develop
+    depends_on:
+      - rabbitmq
+      - postgres_db         
+
+  scheduler:
+    container_name: calend_scheduler
+    restart: always
+    image: calendar_scheduler:develop
+    depends_on:
+      - rabbitmq
+      - postgres_db         
+
+
+  integraton_test:
+    container_name: calend_integration_test
+    image: calend_integration_test:develop    
+    depends_on:
+      - mainSevice   
